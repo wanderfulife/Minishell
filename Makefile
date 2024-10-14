@@ -4,10 +4,10 @@ RED = \033[0;31m
 BLUE = \033[0;34m
 RESET = \033[0m
 
-NAME = minishell
+NAME = Minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
-SRCS = src/minishell.c
+SRCS = src/main.c
 OBJS_DIR = objs
 OBJS = $(SRCS:%.c=$(OBJS_DIR)/%.o)
 DEPS = $(OBJS:.o=.d)
