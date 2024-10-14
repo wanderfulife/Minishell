@@ -4,21 +4,18 @@ RED = \033[0;31m
 BLUE = \033[0;34m
 RESET = \033[0m
 
-NAME = push_swap
+NAME = minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
-
-SRCS = src/push_swap.c src/utils.c src/parsing.c src/cleanup.c src/init.c src/utils2.c src/movements/swap_push.c src/movements/rotate.c src/movements/reverse_rotate.c src/sort/radix_sort.c src/sort/small_sorts.c
-
+SRCS = src/minishell.c
 OBJS_DIR = objs
 OBJS = $(SRCS:%.c=$(OBJS_DIR)/%.o)
-
 DEPS = $(OBJS:.o=.d)
 
 LIBFT_DIR = ./libft
 LIBFT = $(LIBFT_DIR)/libftprintf.a 
 
-CFLAGS += -I$(LIBFT_DIR)/includes
+CFLAGS += -I$(LIBFT_DIR)/includes -Iincludes
 LDFLAGS += -L$(LIBFT_DIR) -lftprintf
 
 all: $(NAME)
@@ -30,22 +27,27 @@ $(NAME): $(OBJS) $(LIBFT)
 $(OBJS_DIR)/%.o: %.c
 	@mkdir -p $(@D)
 	@printf "$(YELLOW)Compiling $<... $(RESET)"
-	@if $(CC) $(CFLAGS) -MMD -MP -I./includes -Ilibft -c $< -o $@ 2>/dev/null; then 		printf "$(GREEN)Done!$(RESET)\n"; 	else 		printf "$(RED)Failed!$(RESET)\n"; 		exit 1; 	fi
+	@if $(CC) $(CFLAGS) -MMD -MP -c $< -o $@; then \
+		printf "$(GREEN)Done!$(RESET)\n"; \
+	else \
+		printf "$(RED)Failed!$(RESET)\n"; \
+		exit 1; \
+	fi
 
 $(LIBFT):
 	@echo "$(YELLOW)Compiling libft...$(RESET)"
-	@$(MAKE) -C $(LIBFT_DIR) > /dev/null
+	@$(MAKE) -C $(LIBFT_DIR)
 	@echo "$(GREEN)libft compilation done!$(RESET)"
 
 clean:
 	@echo "$(YELLOW)Cleaning up...$(RESET)"
-	@$(MAKE) -C libft clean > /dev/null
+	@$(MAKE) -C $(LIBFT_DIR) clean
 	@rm -rf $(OBJS_DIR)
 	@echo "$(GREEN)Clean done!$(RESET)"
 
 fclean: clean
 	@echo "$(YELLOW)Full cleanup...$(RESET)"
-	@$(MAKE) -C libft fclean > /dev/null
+	@$(MAKE) -C $(LIBFT_DIR) fclean
 	@rm -f $(NAME)
 	@echo "$(GREEN)Full cleanup done!$(RESET)"
 
