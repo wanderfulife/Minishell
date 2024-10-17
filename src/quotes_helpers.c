@@ -1,40 +1,32 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins.c                                         :+:      :+:    :+:   */
+/*   quotes_helpers.c                                   :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 17:09:30 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/17 18:13:29 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/17 19:09:59 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-// Changes the directory
-void ft_cd(char *path) {
-    if (!path) {
-        path = getenv("HOME");
-    }
-    if (chdir(path) != 0) {
-        perror("cd");
-    }
+
+int handle_single_quote(char c, int in_single_quote, int in_double_quote) {
+    if (c == '\'' && !in_double_quote)
+        return !in_single_quote;
+    return in_single_quote;
 }
 
-// Prints the current working directory
-void ft_pwd(void) {
-    char cwd[1024];
-    if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        printf("%s\n", cwd);
-    } else {
-        perror("pwd");
-    }
+int handle_double_quote(char c, int in_single_quote, int in_double_quote) {
+    if (c == '"' && !in_single_quote)
+        return !in_double_quote;
+    return in_double_quote;
 }
 
-// Exits the shell
-void ft_exit(void) {
-    printf("Exiting...\n");
-    exit(0);
-}
 
+// Copies characters into the buffer within single or double quotes
+void copy_to_buffer(char *buffer, char c, int *buf_idx) {
+    buffer[(*buf_idx)++] = c;
+}

@@ -1,40 +1,27 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   builtins.c                                         :+:      :+:    :+:   */
+/*   space_helpers.c                                    :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/14 17:09:30 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/17 18:13:29 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/17 19:13:17 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
-// Changes the directory
-void ft_cd(char *path) {
-    if (!path) {
-        path = getenv("HOME");
-    }
-    if (chdir(path) != 0) {
-        perror("cd");
-    }
-}
 
-// Prints the current working directory
-void ft_pwd(void) {
-    char cwd[1024];
-    if (getcwd(cwd, sizeof(cwd)) != NULL) {
-        printf("%s\n", cwd);
-    } else {
-        perror("pwd");
+int handle_spaces(char *line, int *i, char *buffer, int *buf_idx, t_token **head) {
+    if (isspace(line[*i])) {
+        if (*buf_idx > 0) {
+            buffer[*buf_idx] = '\0';
+            t_token *new_token = create_token(buffer, ARG);
+            add_token_to_list(head, new_token);
+            *buf_idx = 0;
+        }
+        return 1;
     }
+    return 0;
 }
-
-// Exits the shell
-void ft_exit(void) {
-    printf("Exiting...\n");
-    exit(0);
-}
-

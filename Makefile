@@ -7,7 +7,9 @@ RESET = \033[0m
 NAME = Minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
-SRCS = src/main.c src/builtins.c src/exec.c src/utils.c
+SRCS = src/main.c src/builtins.c src/exec.c src/cmd_helpers.c src/free_helpers.c \
+       src/parser.c src/tokenizer.c src/tokenizer_helpers.c src/expand_helpers.c \
+       src/quotes_helpers.c src/token_helpers.c src/redirection_helpers.c src/space_helpers.c
 OBJS_DIR = objs
 OBJS = $(SRCS:%.c=$(OBJS_DIR)/%.o)
 DEPS = $(OBJS:.o=.d)
@@ -18,7 +20,7 @@ LIBFT = $(LIBFT_DIR)/libftprintf.a
 # Include directories for libft and readline
 CFLAGS += -I$(LIBFT_DIR)/includes -Iincludes -I/usr/include/readline
 # Linker flags for libft and readline
-LDFLAGS += -L$(LIBFT_DIR) -lftprintf -lreadline
+LDFLAGS += -L$(LIBFT_DIR) -lftprintf -L/usr/lib -lreadline
 
 all: $(NAME)
 
