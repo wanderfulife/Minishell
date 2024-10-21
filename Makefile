@@ -7,7 +7,7 @@ RESET = \033[0m
 NAME = Minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
-SRCS = src/main.c
+SRCS = src/main.c src/tokenize.c
 OBJS_DIR = objs
 OBJS = $(SRCS:%.c=$(OBJS_DIR)/%.o)
 DEPS = $(OBJS:.o=.d)
