@@ -7,16 +7,18 @@ RESET = \033[0m
 NAME = Minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
+
 SRCS = src/main.c src/tokenize.c
 OBJS_DIR = objs
 OBJS = $(SRCS:%.c=$(OBJS_DIR)/%.o)
 DEPS = $(OBJS:.o=.d)
 
 LIBFT_DIR = ./libft
-LIBFT = $(LIBFT_DIR)/libftprintf.a 
+LIBFT = $(LIBFT_DIR)/libftprintf.a
 
 # Include directories for libft and readline
 CFLAGS += -I$(LIBFT_DIR)/includes -Iincludes -I/usr/include/readline
+
 # Linker flags for libft and readline
 LDFLAGS += -L$(LIBFT_DIR) -lftprintf -L/usr/lib -lreadline
 
@@ -41,6 +43,13 @@ $(LIBFT):
 	@$(MAKE) -C $(LIBFT_DIR)
 	@echo "$(GREEN)libft compilation done!$(RESET)"
 
+test: $(LIBFT)
+	@echo "$(YELLOW)Building tests...$(RESET)"
+	@$(CC) $(CFLAGS) test_tokenizer.c src/tokenize.c -L$(LIBFT_DIR) -lftprintf -lreadline -o test_tokenizer
+	@echo "$(GREEN)Test binary created!$(RESET)"
+	@echo "$(BLUE)Running tests...$(RESET)"
+	@./test_tokenizer
+
 clean:
 	@echo "$(YELLOW)Cleaning up...$(RESET)"
 	@$(MAKE) -C $(LIBFT_DIR) clean
@@ -51,10 +60,11 @@ fclean: clean
 	@echo "$(YELLOW)Full cleanup...$(RESET)"
 	@$(MAKE) -C $(LIBFT_DIR) fclean
 	@rm -f $(NAME)
+	@rm -f test_tokenizer
 	@echo "$(GREEN)Full cleanup done!$(RESET)"
 
 re: fclean all
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re test
 
 -include $(DEPS)
