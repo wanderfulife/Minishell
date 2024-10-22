@@ -6,12 +6,72 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/10/22 13:25:37 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/22 13:25:49 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/22 17:37:27 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../includes/minishell.h"
 
+void handle_consecutive_quotes(t_token **tokens, int *token_count, char *input, int *i, char quote)
+{
+    int j = *i + 1;
+    while (input[j] == quote)
+        j++;
+    if (j > *i + 1)
+    {
+        add_token(tokens, token_count, ft_strdup(""), TOKEN_WORD);
+        *i = j;
+        return;
+    }
+    add_token(tokens, token_count, ft_strdup(""), TOKEN_WORD);
+}
+
+void parse_quoted_token(t_token **tokens, int *token_count, char *input, int *i)
+{
+    char quote = input[*i];
+    int start = *i + 1;
+
+    (*i)++;
+    while (input[*i] && input[*i] != quote)
+        (*i)++;
+    
+    if (input[*i] == quote)
+    {
+        if (start == *i)
+        {
+            handle_consecutive_quotes(tokens, token_count, input, i, quote);
+            return;
+        }
+        else
+            add_token(tokens, token_count, ft_substr(input, start, *i - start), TOKEN_WORD);
+        (*i)++;
+    }
+    else
+    {
+        add_token(tokens, token_count, ft_substr(input, start - 1, ft_strlen(input) - start + 1), TOKEN_WORD);
+    }
+}
+
+
+void merge_quote_tokens(t_token **tokens, int *token_count)
+{
+    int i = 0;
+    while (i < *token_count - 1)
+    {
+        if (tokens[i]->type == TOKEN_WORD && tokens[i + 1]->type == TOKEN_WORD &&
+            (ft_strchr("\"'", tokens[i]->value[ft_strlen(tokens[i]->value) - 1]) ||
+             ft_strchr("\"'", tokens[i + 1]->value[0])))
+        {
+            char *merged = ft_strjoin(tokens[i]->value, tokens[i + 1]->value);
+            free(tokens[i]->value);
+            free(tokens[i + 1]->value);
+            tokens[i]->value = merged;
+            remove_token(tokens, token_count, i + 1);
+            continue;
+        }
+        i++;
+    }
+}
 void parse_token(t_token **tokens, int *token_count, char *input, int *i)
 {
     int start = *i;
@@ -25,54 +85,4 @@ void parse_token(t_token **tokens, int *token_count, char *input, int *i)
         parse_pipe_or_redir(tokens, token_count, input, i, start);
     else
         parse_word_token(tokens, token_count, input, i, start);
-}
-
-void parse_quoted_token(t_token **tokens, int *token_count, char *input, int *i)
-{
-    char quote = input[*i];
-    (*i)++;
-    int start = *i;
-
-    while (input[*i] && input[*i] != quote)
-        (*i)++;
-
-    if (input[*i] == quote)
-    {
-        if (*i > start || (input[*i + 1] && (input[*i + 1] == '"' || input[*i + 1] == '\'')))
-            add_token(tokens, token_count, ft_substr(input, start, *i - start), TOKEN_WORD);
-        else if (input[*i + 1] == quote)
-            (*i)++;
-        else
-            add_token(tokens, token_count, ft_strdup(""), TOKEN_WORD);
-        (*i)++;
-    }
-    else
-    {
-        add_token(tokens, token_count, ft_substr(input, start - 1, ft_strlen(input) - start + 1), TOKEN_WORD);
-    }
-}
-
-
-void parse_redir_append_or_heredoc(t_token **tokens, int *token_count, char *input, int *i, int start)
-{
-    if (*i > start)
-        add_token(tokens, token_count, ft_substr(input, start, *i - start), TOKEN_WORD);
-    add_token(tokens, token_count, ft_substr(input, *i, 2), get_token_type(input[*i], input[*i + 1]));
-    (*i) += 2;
-}
-
-void parse_pipe_or_redir(t_token **tokens, int *token_count, char *input, int *i, int start)
-{
-    if (*i > start)
-        add_token(tokens, token_count, ft_substr(input, start, *i - start), TOKEN_WORD);
-    add_token(tokens, token_count, ft_substr(input, *i, 1), get_token_type(input[*i], input[*i + 1]));
-    (*i)++;
-}
-
-void parse_word_token(t_token **tokens, int *token_count, char *input, int *i, int start)
-{
-    while (input[*i] && !ft_strchr(" \t|<>\"'", input[*i]))
-        (*i)++;
-    if (*i > start)
-        add_token(tokens, token_count, ft_substr(input, start, *i - start), TOKEN_WORD);
 }

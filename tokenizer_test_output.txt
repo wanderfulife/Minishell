@@ -26,11 +26,13 @@ Token: '/home/user', Type: 0
 --- Quotes - Single Empty ---
 Input: ''''
 Token: '', Type: 0
+Token: ''', Type: 0
 -------------------
 
 --- Quotes - Double Empty ---
 Input: '""'
 Token: '', Type: 0
+Token: '"', Type: 0
 -------------------
 
 --- Quotes - Single Word ---
@@ -52,27 +54,20 @@ Token: '"', Type: 0
 Input: 'echo ''''''''
 Token: 'echo', Type: 0
 Token: '', Type: 0
-Token: '', Type: 0
-Token: '', Type: 0
-Token: ''', Type: 0
 -------------------
 
 --- Quotes - Multiple 2 ---
 Input: 'echo """""""'
 Token: 'echo', Type: 0
 Token: '', Type: 0
-Token: '', Type: 0
-Token: '', Type: 0
-Token: '"', Type: 0
 -------------------
 
 --- Quotes - Alternating ---
 Input: 'echo ''""''""'
 Token: 'echo', Type: 0
 Token: '', Type: 0
-Token: '', Type: 0
-Token: '', Type: 0
-Token: '', Type: 0
+Token: '""', Type: 0
+Token: ''""', Type: 0
 -------------------
 
 --- Quotes - Complex 1 ---

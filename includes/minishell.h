@@ -46,7 +46,13 @@ void				parse_redir_append_or_heredoc(t_token **tokens,
 						int *token_count, char *input, int *i, int start);
 void				parse_pipe_or_redir(t_token **tokens, int *token_count,
 						char *input, int *i, int start);
+void				merge_quote_tokens(t_token **tokens, int *token_count);
+
 void				parse_word_token(t_token **tokens, int *token_count,
 						char *input, int *i, int start);
+int					is_token_delimiter(char c, char next_c);
+void				remove_token(t_token **tokens, int *token_count, int index);
+void				handle_consecutive_quotes(t_token **tokens,
+						int *token_count, char *input, int *i, char quote);
 
 #endif
