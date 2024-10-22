@@ -8,7 +8,7 @@ NAME = Minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
-SRCS = src/main.c src/tokenize.c
+SRCS = src/main.c src/utils.c src/tokenize.c src/parsing.c
 OBJS_DIR = objs
 OBJS = $(SRCS:%.c=$(OBJS_DIR)/%.o)
 DEPS = $(OBJS:.o=.d)
@@ -45,7 +45,7 @@ $(LIBFT):
 
 test: $(LIBFT)
 	@echo "$(YELLOW)Building tests...$(RESET)"
-	@$(CC) $(CFLAGS) test_tokenizer.c src/tokenize.c -L$(LIBFT_DIR) -lftprintf -lreadline -o test_tokenizer
+	@$(CC) $(CFLAGS) test_tokenizer.c src/utils.c src/tokenize.c src/parsing.c $(LDFLAGS) -o test_tokenizer
 	@echo "$(GREEN)Test binary created!$(RESET)"
 	@echo "$(BLUE)Running tests...$(RESET)"
 	@./test_tokenizer
