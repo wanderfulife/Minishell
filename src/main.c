@@ -5,53 +5,48 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/20 17:53:23 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/21 17:43:02 by JoWander         ###   ########.fr       */
+/*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
+/*   Updated: 2024/10/24 12:07:12 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "../includes/minishell.h"
+#include "minishell.h"
 
-void	setup_project(void)
+void	shell_init(t_shell *shell, char **env)
 {
-	// TODO: Initialize any necessary data structures or settings
+	shell->env = env_init(env);
+	shell->last_exit_status = 0;
+	shell->in_heredoc = 0;
+	shell->current_cmd = NULL;
+	terminal_init(shell);
+	terminal_disable_echoctl(shell);
+	setup_signals();
 }
 
-void	process_input(char *input)
+void	shell_cleanup(t_shell *shell)
 {
-	t_token	*tokens;
-	int		i;
-
-	tokens = tokenize_input(input);
-	if (tokens)
-	{
-		i = 0;
-		while (tokens[i].value)
-		{
-			ft_printf("Token: %s, Type: %d\n", tokens[i].value, tokens[i].type);
-			i++;
-		}
-		free_tokens(tokens);
-	}
+	if (shell->env)
+		env_destroy(shell->env);
+	if (shell->current_cmd)
+		parser_destroy_command(shell->current_cmd);
+	terminal_restore(shell);
+	rl_clear_history();
 }
 
-int	main(void)
+int	main(int argc, char **argv, char **env)
 {
-	char *input;
+	t_shell	shell;
+	int		status;
 
-	setup_project();
-	while (1)
+	(void)argc;
+	(void)argv;
+	shell_init(&shell, env);
+	if (!shell.env)
 	{
-		input = readline("minishell> ");
-		if (!input)
-			break ;
-		if (*input)
-		{
-			add_history(input);
-			process_input(input);
-		}
-		free(input);
+		ft_putendl_fd("minishell: failed to initialize environment", 2);
+		return (1);
 	}
-	ft_printf("Exiting minishell\n");
-	return (0);
+	status = shell_loop(&shell);
+	shell_cleanup(&shell);
+	return (status);
 }

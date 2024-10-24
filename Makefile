@@ -4,11 +4,36 @@ RED = \033[0;31m
 BLUE = \033[0;34m
 RESET = \033[0m
 
-NAME = Minishell
+NAME = minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
-SRCS = src/main.c src/utils.c src/tokenize.c src/parsing.c src/parsing_utils.c
+# Source files
+SRCS = src/main.c src/shell.c src/terminal.c \
+	   src/builtins/cd.c \
+	   src/builtins/echo.c \
+	   src/builtins/env.c \
+	   src/builtins/exit.c \
+	   src/builtins/export.c \
+	   src/builtins/pwd.c \
+	   src/builtins/unset.c \
+	   src/env/env.c \
+	   src/env/env_expand.c \
+	   src/env/env_utils.c \
+	   src/executor/executor.c \
+	   src/executor/executor_utils.c \
+	   src/executor/pipes.c \
+	   src/executor/process.c \
+	   src/executor/redirects.c \
+	   src/lexer/lexer.c \
+	   src/lexer/lexer_utils.c \
+	   src/lexer/token.c \
+	   src/parser/heredoc.c \
+	   src/parser/parser.c \
+	   src/parser/parser_utils.c \
+	   src/parser/redirections.c \
+	   src/signals/signals.c
+
 OBJS_DIR = objs
 OBJS = $(SRCS:%.c=$(OBJS_DIR)/%.o)
 DEPS = $(OBJS:.o=.d)
@@ -43,13 +68,6 @@ $(LIBFT):
 	@$(MAKE) -C $(LIBFT_DIR)
 	@echo "$(GREEN)libft compilation done!$(RESET)"
 
-test: $(LIBFT)
-	@echo "$(YELLOW)Building tests...$(RESET)"
-	@$(CC) $(CFLAGS) test_tokenizer.c src/utils.c src/tokenize.c src/parsing.c src/parsing_utils.c $(LDFLAGS) -o test_tokenizer
-	@echo "$(GREEN)Test binary created!$(RESET)"
-	@echo "$(BLUE)Running tests...$(RESET)"
-	@./test_tokenizer
-
 clean:
 	@echo "$(YELLOW)Cleaning up...$(RESET)"
 	@$(MAKE) -C $(LIBFT_DIR) clean
@@ -60,11 +78,10 @@ fclean: clean
 	@echo "$(YELLOW)Full cleanup...$(RESET)"
 	@$(MAKE) -C $(LIBFT_DIR) fclean
 	@rm -f $(NAME)
-	@rm -f test_tokenizer
 	@echo "$(GREEN)Full cleanup done!$(RESET)"
 
 re: fclean all
 
-.PHONY: all clean fclean re test
+.PHONY: all clean fclean re
 
 -include $(DEPS)

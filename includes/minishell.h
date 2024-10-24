@@ -1,58 +1,63 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   minishell.h                                        :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
+/*   Updated: 2024/10/24 11:38:14 by JoWander         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #ifndef MINISHELL_H
 # define MINISHELL_H
 
 # include "../libft/includes/libft.h"
-# include <readline/history.h>
-# include <readline/readline.h>
 # include <stdio.h>
-# include <stdlib.h>
-# include <unistd.h>
+# include <readline/readline.h>
+# include <readline/history.h>
+# include <signal.h>
+# include <termios.h>
 
-typedef enum e_token_type
+# define PROMPT "minishell$ "
+
+/* Define the shell structure first */
+typedef struct s_shell
 {
-	TOKEN_WORD,
-	TOKEN_PIPE,
-	TOKEN_REDIR_IN,
-	TOKEN_REDIR_OUT,
-	TOKEN_REDIR_APPEND,
-	TOKEN_HEREDOC,
-	TOKEN_DQUOTE,
-	TOKEN_SQUOTE,
-	TOKEN_SPACE
-}					t_token_type;
+	char			**env;
+	int				last_exit_status;
+	int				in_heredoc;
+	struct termios	original_term;
+	struct s_command	*current_cmd;
+}	t_shell;
 
-typedef struct s_token
-{
-	char			*value;
-	t_token_type	type;
-}					t_token;
+/* Then include other headers that might need t_shell */
+# include "lexer.h"
+# include "parser.h"
+# include "executor.h"
+# include "env.h"
+# include "builtins.h"
+# include "signals.h"
 
-// Function prototypes
-void				setup_project(void);
-t_token				*tokenize_input(char *input);
-t_token_type		get_token_type(char c, char next_c);
-void				add_token(t_token **tokens, int *token_count, char *value,
-						t_token_type type);
-void				handle_quotes(char *input, int *i, t_token_type quote_type);
-void				process_input(char *input);
-void				free_tokens(t_token *tokens);
-void				skip_whitespace(char *input, int *i);
-t_token				*initialize_empty_token(void);
-void				parse_token(t_token **tokens, int *token_count, char *input,
-						int *i);
-void				parse_quoted_token(t_token **tokens, int *token_count,
-						char *input, int *i);
-void				parse_redir_append_or_heredoc(t_token **tokens,
-						int *token_count, char *input, int *i, int start);
-void				parse_pipe_or_redir(t_token **tokens, int *token_count,
-						char *input, int *i, int start);
-void				merge_quote_tokens(t_token **tokens, int *token_count);
+/* main.c */
+void	shell_init(t_shell *shell, char **env);
+void	shell_cleanup(t_shell *shell);
 
-void				parse_word_token(t_token **tokens, int *token_count,
-						char *input, int *i, int start);
-int					is_token_delimiter(char c, char next_c);
-void				remove_token(t_token **tokens, int *token_count, int index);
-void				handle_consecutive_quotes(t_token **tokens,
-						int *token_count, char *input, int *i, char quote);
+/* shell.c */
+int		shell_loop(t_shell *shell);
+void	shell_reset_signals(void);
+int		shell_process_input(t_shell *shell, char *input);
+
+/* signals.c */
+void	setup_signals(void);
+void	handle_sigint(int sig);
+void	handle_sigquit(int sig);
+void	restore_prompt(int sig);
+
+/* terminal.c */
+void	terminal_init(t_shell *shell);
+void	terminal_restore(t_shell *shell);
+void	terminal_disable_echoctl(t_shell *shell);
 
 #endif
