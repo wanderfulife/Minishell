@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 11:42:27 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/24 18:29:24 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,14 +85,19 @@ char	*env_expand_vars(char *str, t_shell *shell)
 	char	*var_name;
 	char	*var_value;
 	int		i;
+	int		in_single_quote;
 
 	expanded = env_expand_exit_status(str, shell);
 	if (!expanded)
 		return (NULL);
 	i = 0;
+	in_single_quote = 0;
 	while (expanded[i])
 	{
-		if (expanded[i] == '$' && expanded[i + 1] && expanded[i + 1] != ' ')
+		if (expanded[i] == '\'')
+			in_single_quote = !in_single_quote;
+		if (expanded[i] == '$' && expanded[i + 1] && 
+			expanded[i + 1] != ' ' && !in_single_quote)
 		{
 			var_name = env_get_var_name(expanded + i + 1);
 			if (!var_name)

@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 12:19:36 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/24 18:31:50 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,44 +23,22 @@ int	executor_init_pipe(t_command *cmd)
 }
 // In src/executor/pipes.c
 
-int	executor_setup_pipes(t_command *cmd)
-{
-	t_command	*current;
-
-	current = cmd;
-	while (current && current->pipe_next)
-	{
-		if (pipe(current->pipe_fd) == -1)
-		{
-			perror("pipe");
-			return (0);
-		}
-		current = current->pipe_next;
-	}
-	return (1);
-}
-
 void	executor_connect_pipes(t_command *cmd, int is_last)
 {
-	if (!is_last)  // Not the last command
+	if (!is_last && cmd->pipe_fd[1] != -1)
 	{
-		if (cmd->pipe_fd[1] != -1)
-		{
-			dup2(cmd->pipe_fd[1], STDOUT_FILENO);
-			close(cmd->pipe_fd[1]);
-		}
+		dup2(cmd->pipe_fd[1], STDOUT_FILENO);
+		close(cmd->pipe_fd[1]);
+		cmd->pipe_fd[1] = -1;
 	}
 	
-	if (cmd != NULL && cmd->pipe_next != NULL)  // Not the first command
+	if (cmd->pipe_next && cmd->pipe_next->pipe_fd[0] != -1)
 	{
-		if (cmd->pipe_next->pipe_fd[0] != -1)
-		{
-			dup2(cmd->pipe_next->pipe_fd[0], STDIN_FILENO);
-			close(cmd->pipe_next->pipe_fd[0]);
-		}
+		dup2(cmd->pipe_next->pipe_fd[0], STDIN_FILENO);
+		close(cmd->pipe_next->pipe_fd[0]);
+		cmd->pipe_next->pipe_fd[0] = -1;
 	}
 }
-
 void	executor_close_pipes(t_command *cmd)
 {
 	t_command	*current;
@@ -80,4 +58,18 @@ void	executor_close_pipes(t_command *cmd)
 		}
 		current = current->pipe_next;
 	}
+}
+
+int	executor_setup_pipes(t_command *cmd)
+{
+	t_command	*current;
+
+	current = cmd;
+	while (current && current->pipe_next)
+	{
+		if (pipe(current->pipe_fd) == -1)
+			return (0);
+		current = current->pipe_next;
+	}
+	return (1);
 }
