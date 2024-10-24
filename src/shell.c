@@ -6,12 +6,11 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 12:07:08 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/24 18:46:31 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "minishell.h"
-
 
 static void	shell_free_command(t_shell *shell)
 {
@@ -21,7 +20,6 @@ static void	shell_free_command(t_shell *shell)
 		shell->current_cmd = NULL;
 	}
 }
-// In src/shell.c
 
 int	shell_process_input(t_shell *shell, char *input)
 {
@@ -43,7 +41,7 @@ int	shell_process_input(t_shell *shell, char *input)
 		return (1);
 	shell->last_exit_status = executor_run_command(shell->current_cmd, shell);
 	shell_free_command(shell);
-	shell->current_cmd = NULL;  // Ensure command is cleared
+	shell->current_cmd = NULL;
 	return (1);
 }
 
@@ -55,32 +53,22 @@ int	shell_loop(t_shell *shell)
 	{
 		shell_reset_signals();
 		input = readline(PROMPT);
-		
-		// Handle EOF (Ctrl+D) or errors
 		if (!input)
 		{
 			ft_putendl_fd("exit", 2);
 			break ;
 		}
-
-		// Add to history if not empty
 		if (*input)
 			add_history(input);
-
-		// Process input and check for exit
 		if (!shell_process_input(shell, input))
 		{
 			free(input);
 			break ;
 		}
-
 		free(input);
 	}
-	// No need for rl_clear_history() as it's handled in cleanup
 	return (shell->last_exit_status);
 }
-
-
 
 void	shell_reset_signals(void)
 {

@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 11:46:18 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/24 18:43:11 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -88,7 +88,7 @@ int	parser_handle_heredoc(t_command *cmd, char *delim)
 {
 	t_redirect	*redir;
 
-	(void)delim;  /* Mark parameter as intentionally unused */
+	(void)delim;
 	redir = cmd->redirects;
 	while (redir->next)
 		redir = redir->next;

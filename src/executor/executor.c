@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 18:30:42 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/24 18:36:09 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,8 +65,7 @@ static int	executor_single_command(t_command *cmd, t_shell *shell)
 		return (0);
 	}
 	status = executor_is_builtin(cmd->args[0]) ? 
-		executor_handle_builtin(cmd, shell) : 
-		executor_execute(cmd, shell);
+		executor_handle_builtin(cmd, shell) : executor_execute(cmd, shell);
 	executor_reset_fds(saved_stdin, saved_stdout);
 	return (status);
 }

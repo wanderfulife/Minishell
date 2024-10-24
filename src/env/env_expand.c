@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 18:29:24 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/24 18:38:24 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,8 +50,7 @@ static char	*env_replace_var(char *str, int start, int len, char *value)
 	ft_strlcpy(new_str, str, start + 1);
 	if (value)
 		ft_strlcpy(new_str + start, value, value_len + 1);
-	ft_strlcpy(new_str + start + value_len, 
-		str + start + len, ft_strlen(str + start + len) + 1);
+	ft_strlcpy(new_str + start + value_len, str + start + len, ft_strlen(str + start + len) + 1);
 	return (new_str);
 }
 
@@ -96,8 +95,8 @@ char	*env_expand_vars(char *str, t_shell *shell)
 	{
 		if (expanded[i] == '\'')
 			in_single_quote = !in_single_quote;
-		if (expanded[i] == '$' && expanded[i + 1] && 
-			expanded[i + 1] != ' ' && !in_single_quote)
+		if (expanded[i] == '$' && expanded[i + 1] && expanded[i + 1] != ' '
+			&& !in_single_quote)
 		{
 			var_name = env_get_var_name(expanded + i + 1);
 			if (!var_name)

@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 12:17:09 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/24 18:41:02 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,13 +15,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <stdlib.h>
-
-
-// In src/executor/process.c
-
-#include "executor.h"
-#include <unistd.h>
-#include <sys/wait.h>
 
 static void	executor_child_process(t_command *cmd, t_shell *shell)
 {
