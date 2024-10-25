@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 18:36:09 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/25 13:14:07 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -70,71 +70,67 @@ static int	executor_single_command(t_command *cmd, t_shell *shell)
 	return (status);
 }
 
-// In src/executor/executor.c
-
-static int	executor_pipeline(t_command *cmd, t_shell *shell)
+static int executor_pipeline(t_command *cmd, t_shell *shell)
 {
-	int		pipes[2];
-	pid_t	pid;
-	int		status;
-	int		prev_pipe;
+    int     prev_pipe;
+    pid_t   pid;
+    int     status;
+    int     last_pid;
+    int     pipe_fd[2];
 
-	prev_pipe = STDIN_FILENO;
-	while (cmd)
-	{
-		if (cmd->pipe_next && pipe(pipes) < 0)
-			return (1);
+    prev_pipe = STDIN_FILENO;
+    while (cmd)
+    {
+        if (cmd->pipe_next && pipe(pipe_fd) < 0)
+            return (1);
 
-		pid = fork();
-		if (pid < 0)
-			return (1);
+        pid = fork();
+        if (pid == 0)
+        {
+            signal(SIGINT, SIG_DFL);
+            signal(SIGQUIT, SIG_DFL);
 
-		if (pid == 0)
-		{
-			// Child process
-			if (prev_pipe != STDIN_FILENO)
-			{
-				dup2(prev_pipe, STDIN_FILENO);
-				close(prev_pipe);
-			}
-			
-			if (cmd->pipe_next)
-			{
-				close(pipes[0]);
-				dup2(pipes[1], STDOUT_FILENO);
-				close(pipes[1]);
-			}
+            if (prev_pipe != STDIN_FILENO)
+            {
+                dup2(prev_pipe, STDIN_FILENO);
+                close(prev_pipe);
+            }
+            
+            if (cmd->pipe_next)
+            {
+                close(pipe_fd[0]);
+                dup2(pipe_fd[1], STDOUT_FILENO);
+                close(pipe_fd[1]);
+            }
 
-			if (executor_is_builtin(cmd->args[0]))
-			{
-				executor_handle_builtin(cmd, shell);
-				exit(0);
-			}
+            if (!executor_setup_redirects(cmd->redirects))
+                exit(1);
 
-			char *path = executor_find_command(cmd->args[0], shell->env);
-			if (!path)
-				exit(127);
-			execve(path, cmd->args, shell->env);
-			exit(126);
-		}
+            if (executor_is_builtin(cmd->args[0]))
+            {
+                status = executor_handle_builtin(cmd, shell);
+                exit(status);
+            }
 
-		// Parent process
-		if (prev_pipe != STDIN_FILENO)
-			close(prev_pipe);
+            executor_execute(cmd, shell);
+            exit(127);
+        }
 
-		if (cmd->pipe_next)
-		{
-			close(pipes[1]);
-			prev_pipe = pipes[0];
-		}
+        if (prev_pipe != STDIN_FILENO)
+            close(prev_pipe);
 
-		cmd = cmd->pipe_next;
-	}
+        if (cmd->pipe_next)
+        {
+            close(pipe_fd[1]);
+            prev_pipe = pipe_fd[0];
+        }
 
-	while (wait(&status) > 0)
-		continue;
+        last_pid = pid;
+        cmd = cmd->pipe_next;
+    }
 
-	return (WEXITSTATUS(status));
+    status = executor_wait_all(last_pid);
+    return (WEXITSTATUS(status));
 }
 
 int	executor_run_command(t_command *cmd, t_shell *shell)
