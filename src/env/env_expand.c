@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/25 13:44:42 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/25 15:58:05 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -98,13 +98,12 @@ char	*env_expand_vars(char *str, t_shell *shell)
 			in_single_quote = !in_single_quote;
 		if (!in_single_quote && expanded[i] == '$' && expanded[i + 1]
 			&& expanded[i + 1] != ' ' && expanded[i + 1] != '\'' && expanded[i
-			+ 1] != '"')
+				+ 1] != '"')
 		{
 			var_name = env_get_var_name(expanded + i + 1);
 			if (!var_name)
 				return (NULL);
 			if (ft_strncmp(var_name, "?", 2) == 0)
-				// Changed to ft_strncmp with length 2
 			{
 				var_value = ft_itoa(shell->last_exit_status);
 			}

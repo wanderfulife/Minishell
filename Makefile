@@ -25,6 +25,7 @@ SRCS = src/main.c src/shell.c src/terminal.c \
 	   src/executor/pipes.c \
 	   src/executor/process.c \
 	   src/executor/redirects.c \
+	   src/lexer/handle.c \
 	   src/lexer/lexer.c \
 	   src/lexer/lexer_utils.c \
 	   src/lexer/token.c \

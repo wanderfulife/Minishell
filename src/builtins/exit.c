@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/25 13:44:20 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/25 15:31:02 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,11 +30,13 @@ int	is_numeric_arg(char *str)
 	}
 	return (1);
 }
+
 static int	is_space(char c)
 {
 	return (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f'
 		|| c == '\r');
 }
+
 static int	is_valid_number(const char *str)
 {
 	int	i;
@@ -54,6 +56,7 @@ static int	is_valid_number(const char *str)
 	}
 	return (1);
 }
+
 int	builtin_exit(char **args, t_shell *shell)
 {
 	long	exit_code;

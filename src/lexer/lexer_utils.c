@@ -6,28 +6,11 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/25 13:43:06 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/25 15:39:36 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lexer.h"
-
-void	lexer_add_token(t_token **list, t_token *new)
-{
-	t_token	*current;
-
-	if (!list || !new)
-		return ;
-	if (!*list)
-	{
-		*list = new;
-		return ;
-	}
-	current = *list;
-	while (current->next)
-		current = current->next;
-	current->next = new;
-}
 
 int	lexer_is_operator(char c)
 {
@@ -60,7 +43,7 @@ t_token	*lexer_handle_operator(char *input, int *i)
 	return (lexer_create_token(op, type));
 }
 
-static char	*join_word_parts(char **parts)
+char	*join_word_parts(char **parts)
 {
 	char	*result;
 	char	*temp;
@@ -80,7 +63,7 @@ static char	*join_word_parts(char **parts)
 	return (result);
 }
 
-static char	*get_next_word_part(char *input, int *i)
+char	*get_next_word_part(char *input, int *i)
 {
 	char	buffer[1024];
 	int		j;
@@ -96,7 +79,7 @@ static char	*get_next_word_part(char *input, int *i)
 	return (ft_strdup(buffer));
 }
 
-static char	*handle_quoted_part(char *input, int *i, char quote)
+char	*handle_quoted_part(char *input, int *i, char quote)
 {
 	char	buffer[1024];
 	int		j;
@@ -112,39 +95,4 @@ static char	*handle_quoted_part(char *input, int *i, char quote)
 		(*i)++;
 	buffer[j] = '\0';
 	return (ft_strdup(buffer));
-}
-
-t_token	*lexer_handle_word(char *input, int *i)
-{
-	char	*parts[1024];
-	int		part_count;
-	char	*word;
-	t_token	*token;
-
-	part_count = 0;
-	while (input[*i] && !lexer_is_operator(input[*i]) && input[*i] != ' '
-		&& input[*i] != '\t')
-	{
-		if (input[*i] == '\'' || input[*i] == '"')
-		{
-			parts[part_count] = handle_quoted_part(input, i, input[*i]);
-			if (!parts[part_count])
-				return (NULL);
-			part_count++;
-		}
-		else
-		{
-			parts[part_count] = get_next_word_part(input, i);
-			if (!parts[part_count])
-				return (NULL);
-			part_count++;
-		}
-	}
-	parts[part_count] = NULL;
-	word = join_word_parts(parts);
-	while (--part_count >= 0)
-		free(parts[part_count]);
-	token = lexer_create_token(word, TOKEN_WORD);
-	free(word);
-	return (token);
 }

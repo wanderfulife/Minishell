@@ -6,12 +6,11 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 18:45:08 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/25 15:40:56 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "lexer.h"
-#include <stdlib.h>
 
 t_token	*lexer_create_token(char *content, int type)
 {
@@ -31,7 +30,7 @@ t_token	*lexer_create_token(char *content, int type)
 	return (token);
 }
 
-static int	lexer_process_token(t_token **tokens, t_token *new)
+int	lexer_process_token(t_token **tokens, t_token *new)
 {
 	if (!new)
 		return (0);
@@ -39,30 +38,18 @@ static int	lexer_process_token(t_token **tokens, t_token *new)
 	return (1);
 }
 
-t_token	*lexer_tokenize(char *input)
+t_token	*cleanup_and_create_token(char *parts[1024], int part_count)
 {
-	t_token	*tokens;
-	int		i;
-	t_token	*new;
+	char	*word;
+	t_token	*token;
 
-	if (!input)
-		return (NULL);
-	tokens = NULL;
-	i = 0;
-	while (input[i])
-	{
-		if (!lexer_skip_spaces(input, &i))
-			continue ;
-		if (input[i] == '\'' || input[i] == '"')
-			new = lexer_handle_quotes(input, &i, input[i]);
-		else if (lexer_is_operator(input[i]))
-			new = lexer_handle_operator(input, &i);
-		else
-			new = lexer_handle_word(input, &i);
-		if (!lexer_process_token(&tokens, new))
-			return (lexer_clear_tokens(&tokens), NULL);
-	}
-	return (tokens);
+	parts[part_count] = NULL;
+	word = join_word_parts(parts);
+	while (--part_count >= 0)
+		free(parts[part_count]);
+	token = lexer_create_token(word, TOKEN_WORD);
+	free(word);
+	return (token);
 }
 
 void	lexer_destroy(t_token *list)
@@ -78,4 +65,21 @@ void	lexer_destroy(t_token *list)
 		free(current);
 		current = next;
 	}
+}
+
+void	lexer_add_token(t_token **list, t_token *new)
+{
+	t_token	*current;
+
+	if (!list || !new)
+		return ;
+	if (!*list)
+	{
+		*list = new;
+		return ;
+	}
+	current = *list;
+	while (current->next)
+		current = current->next;
+	current->next = new;
 }

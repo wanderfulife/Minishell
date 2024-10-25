@@ -6,13 +6,11 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/25 13:43:52 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/25 15:57:01 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "executor.h"
-#include <stdlib.h>
-#include <unistd.h>
 
 char	*executor_find_command(char *cmd, char **envp)
 {

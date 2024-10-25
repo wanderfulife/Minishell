@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 18:45:05 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/25 15:30:28 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -58,4 +58,30 @@ int	lexer_count_tokens(t_token *list)
 		current = current->next;
 	}
 	return (count);
+}
+
+t_token	*lexer_tokenize(char *input)
+{
+	t_token	*tokens;
+	t_token	*new;
+	int		i;
+
+	if (!input)
+		return (NULL);
+	tokens = NULL;
+	i = 0;
+	while (input[i])
+	{
+		if (!lexer_skip_spaces(input, &i))
+			continue ;
+		if (input[i] == '\'' || input[i] == '"')
+			new = lexer_handle_quotes(input, &i, input[i]);
+		else if (lexer_is_operator(input[i]))
+			new = lexer_handle_operator(input, &i);
+		else
+			new = lexer_handle_word(input, &i);
+		if (!lexer_process_token(&tokens, new))
+			return (lexer_clear_tokens(&tokens), NULL);
+	}
+	return (tokens);
 }
