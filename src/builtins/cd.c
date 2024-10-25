@@ -30,33 +30,35 @@ static void	update_pwd_vars(t_shell *shell)
 		env_set(shell, "PWD", cwd);
 }
 
+int	print_cd_error(char *message, char *path)
+{
+	ft_putstr_fd("minishell: cd: ", 2);
+	if (path)
+		ft_putstr_fd(path, 2);
+	ft_putendl_fd(message, 2);
+	return (1);
+}
+
+char	*get_cd_path(char **args, t_shell *shell)
+{
+	if (!args[1])
+		return (get_home_dir(shell));
+	if (args[2])
+		return (NULL);
+	return (args[1]);
+}
+
 int	builtin_cd(char **args, t_shell *shell)
 {
 	char	*path;
 
-	if (!args[1])
-	{
-		path = get_home_dir(shell);
-		if (!path)
-		{
-			ft_putendl_fd("minishell: cd: HOME not set", 2);
-			return (1);
-		}
-	}
-	else if (args[2])
-	{
-		ft_putendl_fd("minishell: cd: too many arguments", 2);
-		return (1);
-	}
-	else
-		path = args[1];
+	path = get_cd_path(args, shell);
+	if (!path)
+		return (print_cd_error("too many arguments", NULL));
+	if (!args[1] && !path)
+		return (print_cd_error("HOME not set", NULL));
 	if (chdir(path) == -1)
-	{
-		ft_putstr_fd("minishell: cd: ", 2);
-		ft_putstr_fd(path, 2);
-		ft_putendl_fd(": No such file or directory", 2);
-		return (1);
-	}
+		return (print_cd_error(": No such file or directory", path));
 	update_pwd_vars(shell);
 	return (0);
 }

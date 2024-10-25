@@ -51,7 +51,8 @@ int	env_find_index(char *name, char **env)
 	i = 0;
 	while (env[i])
 	{
-		if (!ft_strncmp(env[i], name, len) && (env[i][len] == '=' || env[i][len] == '\0'))
+		if (!ft_strncmp(env[i], name, len)
+			&& (env[i][len] == '=' || env[i][len] == '\0'))
 			return (i);
 		i++;
 	}

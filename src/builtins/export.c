@@ -72,34 +72,56 @@ static void	free_array(char **arr)
 	free(arr);
 }
 
+static void	swap_env_vars(char **a, char **b)
+{
+	char	*temp;
+
+	temp = *a;
+	*a = *b;
+	*b = temp;
+}
+
+static void	sort_env_array(char **env)
+{
+	int		i;
+	int		j;
+
+	i = 0;
+	while (env[i])
+	{
+		j = i + 1;
+		while (env[j])
+		{
+			if (ft_strncmp(env[i], env[j], ft_strlen(env[i])) > 0)
+				swap_env_vars(&env[i], &env[j]);
+			j++;
+		}
+		i++;
+	}
+}
+
+static void	print_env_vars(char **env)
+{
+	int	i;
+
+	i = 0;
+	while (env[i])
+	{
+		ft_putstr_fd("declare -x ", 1);
+		ft_putendl_fd(env[i], 1);
+		i++;
+	}
+}
+
 static void	print_sorted_env(char **env)
 {
 	char	**sorted;
-	char	*temp;
-	int		i;
-	int		j;
 
 	sorted = dup_env_array(env);
 	if (!sorted)
 		return ;
-	i = 0;
-	while (sorted[i])
-	{
-		j = i + 1;
-		while (sorted[j])
-		{
-			if (ft_strncmp(sorted[i], sorted[j], ft_strlen(sorted[i])) > 0)
-			{
-				temp = sorted[i];
-				sorted[i] = sorted[j];
-				sorted[j] = temp;
-			}
-			j++;
-		}
-		ft_putstr_fd("declare -x ", 1);
-		ft_putendl_fd(sorted[i], 1);
-		i++;
-	}
+	sort_env_array(sorted);
+	print_env_vars(sorted);
 	free_array(sorted);
 }
 

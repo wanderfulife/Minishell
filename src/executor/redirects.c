@@ -16,38 +16,49 @@
 #include <string.h>
 #include <unistd.h>
 
+int	handle_file_not_found(char *file)
+{
+	ft_putstr_fd("minishell: ", 2);
+	ft_putstr_fd(file, 2);
+	ft_putendl_fd(": No such file or directory", 2);
+	return (-1);
+}
+
+int	handle_open_error(char *file)
+{
+	ft_putstr_fd("minishell: ", 2);
+	ft_putstr_fd(file, 2);
+	if (errno == EACCES)
+		ft_putendl_fd(": Permission denied", 2);
+	else
+		ft_putendl_fd(": No such file or directory", 2);
+	return (-1);
+}
+
+int	get_open_flags(int type)
+{
+	if (type == TOKEN_REDIR_IN)
+		return (O_RDONLY);
+	else if (type == TOKEN_REDIR_OUT)
+		return (O_WRONLY | O_CREAT | O_TRUNC);
+	else if (type == TOKEN_REDIR_APPEND)
+		return (O_WRONLY | O_CREAT | O_APPEND);
+	return (-1);
+}
+
 int	executor_open_file(char *file, int type)
 {
 	int	flags;
 	int	fd;
 
-	if (type == TOKEN_REDIR_IN)
-	{
-		if (access(file, F_OK) == -1)
-		{
-			ft_putstr_fd("minishell: ", 2);
-			ft_putstr_fd(file, 2);
-			ft_putendl_fd(": No such file or directory", 2);
-			return (-1);
-		}
-		flags = O_RDONLY;
-	}
-	else if (type == TOKEN_REDIR_OUT)
-		flags = O_WRONLY | O_CREAT | O_TRUNC;
-	else if (type == TOKEN_REDIR_APPEND)
-		flags = O_WRONLY | O_CREAT | O_APPEND;
-	else
+	if (type == TOKEN_REDIR_IN && access(file, F_OK) == -1)
+		return (handle_file_not_found(file));
+	flags = get_open_flags(type);
+	if (flags == -1)
 		return (-1);
 	fd = open(file, flags, 0644);
 	if (fd == -1)
-	{
-		ft_putstr_fd("minishell: ", 2);
-		ft_putstr_fd(file, 2);
-		if (errno == EACCES)
-			ft_putendl_fd(": Permission denied", 2);
-		else
-			ft_putendl_fd(": No such file or directory", 2);
-	}
+		return (handle_open_error(file));
 	return (fd);
 }
 

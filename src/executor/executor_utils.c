@@ -12,58 +12,70 @@
 
 #include "executor.h"
 
+char	*join_path(char *dir, char *cmd)
+{
+	char	*cmd_path;
+
+	cmd_path = ft_strjoin(dir, cmd);
+	free(dir);
+	return (cmd_path);
+}
+
+void	free_paths(char **paths)
+{
+	int	i;
+
+	i = 0;
+	while (paths[i])
+		free(paths[i++]);
+	free(paths);
+}
+
+char	*check_paths(char **paths, char *cmd)
+{
+	char	*dir;
+	char	*cmd_path;
+	int		i;
+
+	i = 0;
+	while (paths[i])
+	{
+		dir = ft_strjoin(paths[i], "/");
+		if (!dir)
+			return (NULL);
+		cmd_path = join_path(dir, cmd);
+		if (!cmd_path || access(cmd_path, X_OK) == 0)
+			return (cmd_path);
+		free(cmd_path);
+		i++;
+	}
+	return (NULL);
+}
+
 char	*executor_find_command(char *cmd, char **envp)
 {
 	char	*path;
-	char	*dir;
-	char	*cmd_path;
 	char	**paths;
-	int		i;
+	char	*cmd_path;
 
 	if (!cmd || !*cmd)
 		return (NULL);
 	if (ft_strchr(cmd, '/'))
-		return (access(cmd, X_OK) == 0 ? ft_strdup(cmd) : NULL);
+	{
+		if (access(cmd, X_OK) == 0)
+			return (ft_strdup(cmd));
+		else
+			return (NULL);
+	}
 	path = env_get_value("PATH", envp);
 	if (!path)
 		return (NULL);
 	paths = ft_split(path, ':');
 	if (!paths)
 		return (NULL);
-	i = 0;
-	while (paths[i])
-	{
-		dir = ft_strjoin(paths[i], "/");
-		if (!dir)
-		{
-			while (i > 0)
-				free(paths[--i]);
-			free(paths);
-			return (NULL);
-		}
-		cmd_path = ft_strjoin(dir, cmd);
-		free(dir);
-		if (!cmd_path)
-		{
-			while (i > 0)
-				free(paths[--i]);
-			free(paths);
-			return (NULL);
-		}
-		if (access(cmd_path, X_OK) == 0)
-		{
-			while (paths[i])
-				free(paths[i++]);
-			free(paths);
-			return (cmd_path);
-		}
-		free(cmd_path);
-		i++;
-	}
-	while (paths[i])
-		free(paths[i++]);
-	free(paths);
-	return (NULL);
+	cmd_path = check_paths(paths, cmd);
+	free_paths(paths);
+	return (cmd_path);
 }
 
 int	executor_count_commands(t_command *cmd)
