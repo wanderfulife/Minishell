@@ -6,12 +6,13 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 11:38:14 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/25 13:37:53 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
+# define PROMPT "minishell$ "
 
 # include "../libft/includes/libft.h"
 # include <stdio.h>
@@ -19,26 +20,22 @@
 # include <readline/history.h>
 # include <signal.h>
 # include <termios.h>
-
-# define PROMPT "minishell$ "
-
-/* Define the shell structure first */
-typedef struct s_shell
-{
-	char			**env;
-	int				last_exit_status;
-	int				in_heredoc;
-	struct termios	original_term;
-	struct s_command	*current_cmd;
-}	t_shell;
-
-/* Then include other headers that might need t_shell */
 # include "lexer.h"
 # include "parser.h"
 # include "executor.h"
 # include "env.h"
 # include "builtins.h"
 # include "signals.h"
+
+/* Define the shell structure first */
+typedef struct s_shell
+{
+	char				**env;
+	int					last_exit_status;
+	int					in_heredoc;
+	struct termios		original_term;
+	struct s_command	*current_cmd;
+}	t_shell;
 
 /* main.c */
 void	shell_init(t_shell *shell, char **env);

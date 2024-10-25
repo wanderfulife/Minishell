@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/25 13:06:09 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/25 13:44:20 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,55 +30,49 @@ int	is_numeric_arg(char *str)
 	}
 	return (1);
 }
-static int is_space(char c)
+static int	is_space(char c)
 {
-    return (c == ' ' || c == '\t' || c == '\n' || 
-            c == '\v' || c == '\f' || c == '\r');
+	return (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\f'
+		|| c == '\r');
 }
-static int is_valid_number(const char *str)
+static int	is_valid_number(const char *str)
 {
-    int i;
+	int	i;
 
-    i = 0;
-    while (is_space(str[i]))
-        i++;
-        
-    if (str[i] == '-' || str[i] == '+')
-        i++;
-        
-    if (!str[i])
-        return (0);
-        
-    while (str[i])
-    {
-        if (!ft_isdigit(str[i]))
-            return (0);
-        i++;
-    }
-    return (1);
+	i = 0;
+	while (is_space(str[i]))
+		i++;
+	if (str[i] == '-' || str[i] == '+')
+		i++;
+	if (!str[i])
+		return (0);
+	while (str[i])
+	{
+		if (!ft_isdigit(str[i]))
+			return (0);
+		i++;
+	}
+	return (1);
 }
-int builtin_exit(char **args, t_shell *shell)
+int	builtin_exit(char **args, t_shell *shell)
 {
-    long    exit_code;
+	long	exit_code;
 
-    ft_putendl_fd("exit", 2);
-    if (!args[1])
-        exit(shell->last_exit_status);
-
-    if (!is_valid_number(args[1]))
-    {
-        ft_putstr_fd("minishell: exit: ", 2);
-        ft_putstr_fd(args[1], 2);
-        ft_putendl_fd(": numeric argument required", 2);
-        exit(2);
-    }
-
-    exit_code = ft_atol(args[1]);
-    if (args[2])
-    {
-        ft_putendl_fd("minishell: exit: too many arguments", 2);
-        return (1);
-    }
-
-    exit((unsigned char)exit_code);
+	ft_putendl_fd("exit", 2);
+	if (!args[1])
+		exit(shell->last_exit_status);
+	if (!is_valid_number(args[1]))
+	{
+		ft_putstr_fd("minishell: exit: ", 2);
+		ft_putstr_fd(args[1], 2);
+		ft_putendl_fd(": numeric argument required", 2);
+		exit(2);
+	}
+	exit_code = ft_atol(args[1]);
+	if (args[2])
+	{
+		ft_putendl_fd("minishell: exit: too many arguments", 2);
+		return (1);
+	}
+	exit((unsigned char)exit_code);
 }

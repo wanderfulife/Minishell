@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 18:38:51 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/25 13:44:31 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,8 @@ int	env_find_index(char *name, char **env)
 	i = 0;
 	while (env[i])
 	{
-		if (!ft_strncmp(env[i], name, len) && (env[i][len] == '=' || env[i][len] == '\0'))
+		if (!ft_strncmp(env[i], name, len) && (env[i][len] == '='
+				|| env[i][len] == '\0'))
 			return (i);
 		i++;
 	}

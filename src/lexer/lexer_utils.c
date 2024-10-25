@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 18:44:51 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/25 13:43:06 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -86,7 +86,8 @@ static char	*get_next_word_part(char *input, int *i)
 	int		j;
 
 	j = 0;
-	while (input[*i] && !lexer_is_operator(input[*i]) && input[*i] != ' ' && input[*i] != '\t' && input[*i] != '\'' && input[*i] != '"')
+	while (input[*i] && !lexer_is_operator(input[*i]) && input[*i] != ' '
+		&& input[*i] != '\t' && input[*i] != '\'' && input[*i] != '"')
 	{
 		buffer[j++] = input[*i];
 		(*i)++;
@@ -119,10 +120,10 @@ t_token	*lexer_handle_word(char *input, int *i)
 	int		part_count;
 	char	*word;
 	t_token	*token;
-	
+
 	part_count = 0;
-	while (input[*i] && !lexer_is_operator(input[*i]) && 
-		input[*i] != ' ' && input[*i] != '\t')
+	while (input[*i] && !lexer_is_operator(input[*i]) && input[*i] != ' '
+		&& input[*i] != '\t')
 	{
 		if (input[*i] == '\'' || input[*i] == '"')
 		{

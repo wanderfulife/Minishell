@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/25 13:06:50 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/25 13:44:42 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,7 +50,8 @@ static char	*env_replace_var(char *str, int start, int len, char *value)
 	ft_strlcpy(new_str, str, start + 1);
 	if (value)
 		ft_strlcpy(new_str + start, value, value_len + 1);
-	ft_strlcpy(new_str + start + value_len, str + start + len, ft_strlen(str + start + len) + 1);
+	ft_strlcpy(new_str + start + value_len, str + start + len, ft_strlen(str
+			+ start + len) + 1);
 	return (new_str);
 }
 
@@ -78,48 +79,51 @@ char	*env_expand_exit_status(char *str, t_shell *shell)
 	return (str);
 }
 
-char *env_expand_vars(char *str, t_shell *shell)
+char	*env_expand_vars(char *str, t_shell *shell)
 {
-    char    *expanded;
-    char    *var_name;
-    char    *var_value;
-    int     i;
-    int     in_single_quote;
+	char	*expanded;
+	char	*var_name;
+	char	*var_value;
+	int		i;
+	int		in_single_quote;
 
-    expanded = env_expand_exit_status(str, shell);
-    if (!expanded)
-        return (NULL);
-    i = 0;
-    in_single_quote = 0;
-    while (expanded[i])
-    {
-        if (expanded[i] == '\'')
-            in_single_quote = !in_single_quote;
-        if (!in_single_quote && expanded[i] == '$' && expanded[i + 1] && 
-            expanded[i + 1] != ' ' && expanded[i + 1] != '\'' && expanded[i + 1] != '"')
-        {
-            var_name = env_get_var_name(expanded + i + 1);
-            if (!var_name)
-                return (NULL);
-            if (ft_strncmp(var_name, "?", 2) == 0)  // Changed to ft_strncmp with length 2
-            {
-                var_value = ft_itoa(shell->last_exit_status);
-            }
-            else
-            {
-                var_value = env_get_value(var_name, shell->env);
-            }
-            str = env_replace_var(expanded, i, ft_strlen(var_name) + 1, var_value);
-            free(expanded);
-            free(var_name);
-            if (var_name && ft_strncmp(var_name, "?", 2) == 0)  // Changed here too
-                free(var_value);
-            if (!str)
-                return (NULL);
-            expanded = str;
-            continue;
-        }
-        i++;
-    }
-    return (expanded);
+	expanded = env_expand_exit_status(str, shell);
+	if (!expanded)
+		return (NULL);
+	i = 0;
+	in_single_quote = 0;
+	while (expanded[i])
+	{
+		if (expanded[i] == '\'')
+			in_single_quote = !in_single_quote;
+		if (!in_single_quote && expanded[i] == '$' && expanded[i + 1]
+			&& expanded[i + 1] != ' ' && expanded[i + 1] != '\'' && expanded[i
+			+ 1] != '"')
+		{
+			var_name = env_get_var_name(expanded + i + 1);
+			if (!var_name)
+				return (NULL);
+			if (ft_strncmp(var_name, "?", 2) == 0)
+				// Changed to ft_strncmp with length 2
+			{
+				var_value = ft_itoa(shell->last_exit_status);
+			}
+			else
+			{
+				var_value = env_get_value(var_name, shell->env);
+			}
+			str = env_replace_var(expanded, i, ft_strlen(var_name) + 1,
+					var_value);
+			free(expanded);
+			free(var_name);
+			if (var_name && ft_strncmp(var_name, "?", 2) == 0)
+				free(var_value);
+			if (!str)
+				return (NULL);
+			expanded = str;
+			continue ;
+		}
+		i++;
+	}
+	return (expanded);
 }
