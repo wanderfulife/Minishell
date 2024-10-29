@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 18:46:31 by JoWander         ###   ########.fr       */
+/*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
+/*   Updated: 2024/10/29 13:32:11 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -23,8 +23,8 @@ static void	shell_free_command(t_shell *shell)
 
 int	shell_process_input(t_shell *shell, char *input)
 {
-	t_token		*tokens;
-	char		*expanded;
+	t_token	*tokens;
+	char	*expanded;
 
 	if (!input || !*input)
 		return (1);

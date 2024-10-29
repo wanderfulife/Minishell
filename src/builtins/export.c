@@ -5,8 +5,8 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/20 10:00:00 by student           #+#    #+#             */
-/*   Updated: 2024/10/24 18:40:34 by JoWander         ###   ########.fr       */
+/*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
+/*   Updated: 2024/10/29 13:32:54 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -83,8 +83,8 @@ static void	swap_env_vars(char **a, char **b)
 
 static void	sort_env_array(char **env)
 {
-	int		i;
-	int		j;
+	int	i;
+	int	j;
 
 	i = 0;
 	while (env[i])
