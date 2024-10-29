@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/29 13:32:11 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/29 13:56:30 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,7 +15,6 @@
 # define PROMPT "minishell$ "
 
 # include "../libft/includes/libft.h"
-# include "builtins.h"
 # include "env.h"
 # include "executor.h"
 # include "lexer.h"
@@ -26,6 +25,8 @@
 # include <signal.h>
 # include <stdio.h>
 # include <termios.h>
+# include "builtins.h"
+
 
 /* Define the shell structure first */
 typedef struct s_shell
