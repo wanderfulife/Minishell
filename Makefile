@@ -15,13 +15,16 @@ SRCS = src/main.c src/shell.c src/terminal.c \
 	   src/builtins/env.c \
 	   src/builtins/exit.c \
 	   src/builtins/export.c \
+	   src/builtins/export_utils.c \
 	   src/builtins/pwd.c \
 	   src/builtins/unset.c \
 	   src/env/env.c \
 	   src/env/env_expand.c \
+	   src/env/env_expand_utils.c \
 	   src/env/env_utils.c \
 	   src/executor/executor.c \
 	   src/executor/executor_utils.c \
+	   src/executor/executor_builtins.c \
 	   src/executor/pipes.c \
 	   src/executor/process.c \
 	   src/executor/redirects.c \

@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/29 13:32:11 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/31 15:59:43 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,5 +36,5 @@ char					*env_expand_vars(char *str, t_shell *shell);
 char					*env_expand_exit_status(char *str, t_shell *shell);
 int						env_var_length(char *str);
 char					*env_get_var_name(char *str);
-
+int						handle_single_quotes(char c, int in_single_quote);
 #endif

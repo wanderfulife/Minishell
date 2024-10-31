@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/29 13:32:11 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/31 16:14:43 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,4 +51,8 @@ int						executor_wait_all(int last_pid);
 void					executor_exit_status(int status, t_shell *shell);
 int						executor_execute(t_command *cmd, t_shell *shell);
 
+void					executor_parent_process(int *prev_pipe, int pipes[2],
+							t_command *cmd);
+int						executor_single_command(t_command *cmd, t_shell *shell);
+int						executor_pipeline(t_command *cmd, t_shell *shell);
 #endif

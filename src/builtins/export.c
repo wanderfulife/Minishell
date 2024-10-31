@@ -6,7 +6,7 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/29 13:32:54 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/31 15:37:37 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ int	is_valid_identifier(char *str)
 	return (1);
 }
 
-static char	**dup_env_array(char **env)
+char	**dup_env_array(char **env)
 {
 	char	**new;
 	int		i;
@@ -57,7 +57,7 @@ static char	**dup_env_array(char **env)
 	return (new);
 }
 
-static void	free_array(char **arr)
+void	free_array(char **arr)
 {
 	int	i;
 
@@ -72,57 +72,13 @@ static void	free_array(char **arr)
 	free(arr);
 }
 
-static void	swap_env_vars(char **a, char **b)
+void	swap_env_vars(char **a, char **b)
 {
 	char	*temp;
 
 	temp = *a;
 	*a = *b;
 	*b = temp;
-}
-
-static void	sort_env_array(char **env)
-{
-	int	i;
-	int	j;
-
-	i = 0;
-	while (env[i])
-	{
-		j = i + 1;
-		while (env[j])
-		{
-			if (ft_strncmp(env[i], env[j], ft_strlen(env[i])) > 0)
-				swap_env_vars(&env[i], &env[j]);
-			j++;
-		}
-		i++;
-	}
-}
-
-static void	print_env_vars(char **env)
-{
-	int	i;
-
-	i = 0;
-	while (env[i])
-	{
-		ft_putstr_fd("declare -x ", 1);
-		ft_putendl_fd(env[i], 1);
-		i++;
-	}
-}
-
-static void	print_sorted_env(char **env)
-{
-	char	**sorted;
-
-	sorted = dup_env_array(env);
-	if (!sorted)
-		return ;
-	sort_env_array(sorted);
-	print_env_vars(sorted);
-	free_array(sorted);
 }
 
 int	builtin_export(char **args, t_shell *shell)

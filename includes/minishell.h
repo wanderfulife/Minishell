@@ -6,25 +6,24 @@
 /*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/29 13:59:27 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/10/31 15:43:45 by JoWander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #ifndef MINISHELL_H
 # define MINISHELL_H
 # define PROMPT "minishell$ "
-
 # include "../libft/includes/libft.h"
 # include "env.h"
+# include "builtins.h"
 # include "executor.h"
 # include "lexer.h"
 # include "parser.h"
 # include <readline/history.h>
 # include <readline/readline.h>
 # include <stdio.h>
+# include <stdlib.h>
 # include <termios.h>
-# include "builtins.h"
-
 
 /* Define the shell structure first */
 typedef struct s_shell
