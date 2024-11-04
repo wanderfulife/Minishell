@@ -20,7 +20,7 @@ commands=(
     "cd /tmp && pwd"
     "cd /nonexistentdir"                # Should handle errors
     "cd -"
-    "cd $HOME"
+    "cd $HOME" #ERROR PROPABLE LEAK
     
     # Variable manipulation and usage
     "export VAR1=Hello"
