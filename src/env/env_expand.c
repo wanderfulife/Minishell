@@ -78,9 +78,9 @@ char	*expand_variable(char *expanded, int i, t_shell *shell)
 		return (NULL);
 	var_value = get_var_value(var_name, shell);
 	new_str = env_replace_var(expanded, i, ft_strlen(var_name) + 1, var_value);
-	free(var_name);
 	if (var_value && ft_strncmp(var_name, "?", 2) == 0)
 		free(var_value);
+	free(var_name);
 	return (new_str);
 }
 
