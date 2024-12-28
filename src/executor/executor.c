@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/31 16:13:47 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/12/28 17:18:38 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,6 +99,8 @@ int	executor_pipeline(t_command *cmd, t_shell *shell)
 	int		prev_pipe;
 
 	prev_pipe = STDIN_FILENO;
+	signal(SIGINT, SIG_IGN);
+	signal(SIGQUIT, SIG_IGN);
 	while (cmd)
 	{
 		if (cmd->pipe_next && pipe(pipes) < 0)
@@ -116,5 +118,6 @@ int	executor_pipeline(t_command *cmd, t_shell *shell)
 	}
 	while (wait(&status) > 0)
 		;
+	shell_reset_signals();
 	return (WEXITSTATUS(status));
 }

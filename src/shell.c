@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   shell.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/29 13:32:11 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/12/28 17:18:38 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,7 @@ int	shell_process_input(t_shell *shell, char *input)
 	shell->last_exit_status = executor_run_command(shell->current_cmd, shell);
 	shell_free_command(shell);
 	shell->current_cmd = NULL;
+	rl_on_new_line();
 	return (1);
 }
 
