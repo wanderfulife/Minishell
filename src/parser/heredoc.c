@@ -3,16 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/29 13:32:11 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/12/28 17:14:01 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.h"
 #include <fcntl.h>
 #include <unistd.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 static char	*get_heredoc_filename(void)
 {
@@ -28,6 +30,30 @@ static char	*get_heredoc_filename(void)
 	return (name);
 }
 
+static int	read_heredoc_input(int fd, char *delimiter)
+{
+	char	*line;
+	int		status;
+	size_t	delim_len;
+
+	status = 1;
+	delim_len = ft_strlen(delimiter);
+	while (1)
+	{
+		line = readline("> ");
+		if (!line)
+			break ;
+		if (ft_strncmp(line, delimiter, delim_len + 1) == 0)
+		{
+			free(line);
+			break ;
+		}
+		ft_putendl_fd(line, fd);
+		free(line);
+	}
+	return (status);
+}
+
 int	parser_setup_heredoc(t_redirect *redir)
 {
 	char	*filename;
@@ -39,6 +65,12 @@ int	parser_setup_heredoc(t_redirect *redir)
 	fd = open(filename, O_WRONLY | O_CREAT | O_TRUNC, 0600);
 	if (fd == -1)
 	{
+		free(filename);
+		return (0);
+	}
+	if (!read_heredoc_input(fd, redir->file))
+	{
+		close(fd);
 		free(filename);
 		return (0);
 	}
