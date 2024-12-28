@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/29 13:33:00 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/12/28 17:55:14 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -61,7 +61,6 @@ int	builtin_exit(char **args, t_shell *shell)
 {
 	long	exit_code;
 
-	ft_putendl_fd("exit", 2);
 	if (!args[1])
 		exit(shell->last_exit_status);
 	if (!is_valid_number(args[1]))

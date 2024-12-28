@@ -6,7 +6,7 @@
 /*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/28 17:18:38 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/28 18:16:22 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,15 +15,23 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
+void	executor_child_process(t_command *cmd, t_shell *shell);
+
 static int	execute_command(t_command *cmd, t_shell *shell)
 {
 	int	status;
+	pid_t	pid;
 
-	if (executor_is_builtin(cmd->args[0]))
-		status = executor_handle_builtin(cmd, shell);
-	else
-		status = executor_execute(cmd, shell);
-	return (status);
+	if (executor_is_builtin(cmd->args[0]) && !cmd->pipe_next)
+		return (executor_handle_builtin(cmd, shell));
+
+	pid = fork();
+	if (pid < 0)
+		return (1);
+	if (pid == 0)
+		executor_child_process(cmd, shell);
+	waitpid(pid, &status, 0);
+	return (WEXITSTATUS(status));
 }
 
 int	executor_single_command(t_command *cmd, t_shell *shell)
@@ -35,12 +43,12 @@ int	executor_single_command(t_command *cmd, t_shell *shell)
 	saved_stdin = dup(STDIN_FILENO);
 	saved_stdout = dup(STDOUT_FILENO);
 	if (saved_stdin == -1 || saved_stdout == -1)
-		return (0);
+		return (1);
 	if (!executor_setup_redirects(cmd->redirects))
 	{
 		close(saved_stdin);
 		close(saved_stdout);
-		return (0);
+		return (1);
 	}
 	status = execute_command(cmd, shell);
 	executor_reset_fds(saved_stdin, saved_stdout);
@@ -65,6 +73,7 @@ void	executor_handle_child_pipes(int prev_pipe, int pipes[2], t_command *cmd)
 void	executor_child_process(t_command *cmd, t_shell *shell)
 {
 	char	*path;
+	int	status;
 
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);
@@ -74,8 +83,8 @@ void	executor_child_process(t_command *cmd, t_shell *shell)
 		exit(0);
 	if (executor_is_builtin(cmd->args[0]))
 	{
-		executor_handle_builtin(cmd, shell);
-		exit(0);
+		status = executor_handle_builtin(cmd, shell);
+		exit(status);
 	}
 	path = executor_find_command(cmd->args[0], shell->env);
 	if (!path)
@@ -97,6 +106,7 @@ int	executor_pipeline(t_command *cmd, t_shell *shell)
 	pid_t	pid;
 	int		status;
 	int		prev_pipe;
+	int		last_pid;
 
 	prev_pipe = STDIN_FILENO;
 	signal(SIGINT, SIG_IGN);
@@ -113,11 +123,13 @@ int	executor_pipeline(t_command *cmd, t_shell *shell)
 			executor_handle_child_pipes(prev_pipe, pipes, cmd);
 			executor_child_process(cmd, shell);
 		}
+		if (!cmd->pipe_next)
+			last_pid = pid;
 		executor_parent_process(&prev_pipe, pipes, cmd);
 		cmd = cmd->pipe_next;
 	}
-	while (wait(&status) > 0)
-		;
+	while (wait(&status) != last_pid)
+		continue ;
 	shell_reset_signals();
 	return (WEXITSTATUS(status));
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_expand.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/31 15:58:47 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/12/28 17:34:27 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,7 +90,7 @@ char	*env_expand_vars(char *str, t_shell *shell)
 	int		i;
 	int		in_single_quote;
 
-	exp = env_expand_exit_status(str, shell);
+	exp = ft_strdup(str);
 	if (!exp)
 		return (NULL);
 	i = 0;
@@ -101,6 +101,15 @@ char	*env_expand_vars(char *str, t_shell *shell)
 		if (!in_single_quote && exp[i] == '$' && exp[i + 1] && exp[i + 1] != ' '
 			&& exp[i + 1] != '\'' && exp[i + 1] != '"')
 		{
+			if (exp[i + 1] == '?')
+			{
+				str = env_replace_var(exp, i, 2, ft_itoa(shell->last_exit_status));
+				free(exp);
+				if (!str)
+					return (NULL);
+				exp = str;
+				continue ;
+			}
 			str = expand_variable(exp, i, shell);
 			free(exp);
 			if (!str)

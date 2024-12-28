@@ -6,7 +6,7 @@
 /*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/28 17:18:38 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/28 18:02:52 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,8 +56,7 @@ int	shell_loop(t_shell *shell)
 		input = readline(PROMPT);
 		if (!input)
 		{
-			ft_putendl_fd("exit", 2);
-			break ;
+			break;
 		}
 		if (*input)
 			add_history(input);

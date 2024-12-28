@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/29 13:32:11 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/12/28 17:49:41 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,15 +28,17 @@ char	*env_get_name(char *var)
 char	*env_create_entry(char *name, char *value)
 {
 	char	*entry;
-	char	*temp;
+	size_t	total_len;
 
 	if (!value)
 		return (ft_strdup(name));
-	temp = ft_strjoin(name, "=");
-	if (!temp)
+	total_len = ft_strlen(name) + ft_strlen(value) + 2;  // +2 for '=' and '\0'
+	entry = (char *)malloc(total_len);
+	if (!entry)
 		return (NULL);
-	entry = ft_strjoin(temp, value);
-	free(temp);
+	ft_strlcpy(entry, name, total_len);
+	ft_strlcat(entry, "=", total_len);
+	ft_strlcat(entry, value, total_len);
 	return (entry);
 }
 

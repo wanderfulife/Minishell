@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirects_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 16:02:21 by JoWander          #+#    #+#             */
-/*   Updated: 2024/11/04 16:12:30 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/12/28 18:10:03 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,20 +18,13 @@
 
 int	handle_file_not_found(char *file)
 {
-	ft_putstr_fd("minishell: ", 2);
-	ft_putstr_fd(file, 2);
-	ft_putendl_fd(": No such file or directory", 2);
+	(void)file;
 	return (-1);
 }
 
 int	handle_open_error(char *file)
 {
-	ft_putstr_fd("minishell: ", 2);
-	ft_putstr_fd(file, 2);
-	if (errno == EACCES)
-		ft_putendl_fd(": Permission denied", 2);
-	else
-		ft_putendl_fd(": No such file or directory", 2);
+	(void)file;
 	return (-1);
 }
 

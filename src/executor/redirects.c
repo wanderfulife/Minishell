@@ -6,7 +6,7 @@
 /*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/28 17:12:32 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/28 18:16:22 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,13 +33,13 @@ int	executor_open_file(char *file, int type)
 	int	fd;
 
 	if (type == TOKEN_REDIR_IN && access(file, F_OK) == -1)
-		return (handle_file_not_found(file));
+		return (-1);
 	flags = get_open_flags(type);
 	if (flags == -1)
 		return (-1);
 	fd = open(file, flags, 0644);
 	if (fd == -1)
-		return (handle_open_error(file));
+		return (-1);
 	return (fd);
 }
 
