@@ -8,6 +8,8 @@ NAME = minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
 
+.PHONY: all clean fclean re
+
 # Source files
 SRCS = src/main.c src/shell.c src/terminal.c \
 	   src/builtins/cd.c \
@@ -71,20 +73,24 @@ $(OBJS_DIR)/%.o: %.c
 
 $(LIBFT):
 	@echo "$(YELLOW)Compiling libft...$(RESET)"
-	@$(MAKE) -C $(LIBFT_DIR)
+	make -C $(LIBFT_DIR)
 	@echo "$(GREEN)libft compilation done!$(RESET)"
 
 clean:
 	@echo "$(YELLOW)Cleaning up...$(RESET)"
 	@$(MAKE) -C $(LIBFT_DIR) clean
-	@rm -rf $(OBJS_DIR)
-	@echo "$(GREEN)Clean done!$(RESET)"
+	@if [ -d "$(OBJS_DIR)" ]; then \
+		rm -rf $(OBJS_DIR); \
+		echo "$(GREEN)Object files cleaned!$(RESET)"; \
+	fi
 
 fclean: clean
 	@echo "$(YELLOW)Full cleanup...$(RESET)"
 	@$(MAKE) -C $(LIBFT_DIR) fclean
-	@rm -f $(NAME)
-	@echo "$(GREEN)Full cleanup done!$(RESET)"
+	@if [ -f "$(NAME)" ]; then \
+		rm -f $(NAME); \
+		echo "$(GREEN)Executable removed!$(RESET)"; \
+	fi
 
 re: fclean all
 
