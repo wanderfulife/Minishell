@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_expand.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: JWander <jowander@student.42.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/28 17:34:27 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/28 22:30:05 by JWander          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -103,7 +103,8 @@ char	*env_expand_vars(char *str, t_shell *shell)
 		{
 			if (exp[i + 1] == '?')
 			{
-				str = env_replace_var(exp, i, 2, ft_itoa(shell->last_exit_status));
+				str = env_replace_var(exp, i, 2,
+						ft_itoa(shell->last_exit_status));
 				free(exp);
 				if (!str)
 					return (NULL);

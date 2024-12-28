@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: JWander <jowander@student.42.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/28 17:49:41 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/28 22:30:56 by JWander          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ char	*env_create_entry(char *name, char *value)
 
 	if (!value)
 		return (ft_strdup(name));
-	total_len = ft_strlen(name) + ft_strlen(value) + 2;  // +2 for '=' and '\0'
+	total_len = ft_strlen(name) + ft_strlen(value) + 2;
 	entry = (char *)malloc(total_len);
 	if (!entry)
 		return (NULL);
@@ -53,8 +53,8 @@ int	env_find_index(char *name, char **env)
 	i = 0;
 	while (env[i])
 	{
-		if (!ft_strncmp(env[i], name, len)
-			&& (env[i][len] == '=' || env[i][len] == '\0'))
+		if (!ft_strncmp(env[i], name, len) && (env[i][len] == '='
+				|| env[i][len] == '\0'))
 			return (i);
 		i++;
 	}

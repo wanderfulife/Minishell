@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: JWander <jowander@student.42.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/28 18:16:22 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/28 22:31:08 by JWander          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,16 +15,15 @@
 #include <sys/wait.h>
 #include <unistd.h>
 
-void	executor_child_process(t_command *cmd, t_shell *shell);
+void		executor_child_process(t_command *cmd, t_shell *shell);
 
 static int	execute_command(t_command *cmd, t_shell *shell)
 {
-	int	status;
+	int		status;
 	pid_t	pid;
 
 	if (executor_is_builtin(cmd->args[0]) && !cmd->pipe_next)
 		return (executor_handle_builtin(cmd, shell));
-
 	pid = fork();
 	if (pid < 0)
 		return (1);
@@ -73,7 +72,7 @@ void	executor_handle_child_pipes(int prev_pipe, int pipes[2], t_command *cmd)
 void	executor_child_process(t_command *cmd, t_shell *shell)
 {
 	char	*path;
-	int	status;
+	int		status;
 
 	signal(SIGINT, SIG_DFL);
 	signal(SIGQUIT, SIG_DFL);

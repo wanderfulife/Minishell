@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   shell.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: JWander <jowander@student.42.fr>           +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/28 18:02:52 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/28 22:28:25 by JWander          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -56,7 +56,7 @@ int	shell_loop(t_shell *shell)
 		input = readline(PROMPT);
 		if (!input)
 		{
-			break;
+			break ;
 		}
 		if (*input)
 			add_history(input);
