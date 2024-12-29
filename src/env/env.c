@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JWander <jowander@student.42.fr>           +#+  +:+       +#+        */
+/*   By: jowander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/28 22:36:50 by JWander          ###   ########.fr       */
+/*   Updated: 2024/12/29 16:26:00 by jowander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -85,8 +85,12 @@ int	env_set(t_shell *shell, char *var, char *value)
 	name = env_get_name(var);
 	if (!name)
 		return (0);
-	if (!value && (equals_pos = ft_strchr(var, '=')))
-		value = equals_pos + 1;
+	if (!value)
+	{
+		equals_pos = ft_strchr(var, '=');
+		if (equals_pos)
+			value = equals_pos + 1;
+	}
 	index = env_find_index(name, shell->env);
 	if (index >= 0)
 	{

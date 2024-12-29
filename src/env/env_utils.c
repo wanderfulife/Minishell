@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JWander <jowander@student.42.fr>           +#+  +:+       +#+        */
+/*   By: jowander <jowander@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/28 22:36:39 by JWander          ###   ########.fr       */
+/*   Updated: 2024/12/29 16:24:59 by jowander         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,7 +54,7 @@ int	env_find_index(char *name, char **env)
 	while (env[i])
 	{
 		if (!ft_strncmp(env[i], name, len) && (env[i][len] == '='
-				|| env[i][len] == '\0'))
+			|| env[i][len] == '\0'))
 			return (i);
 		i++;
 	}
