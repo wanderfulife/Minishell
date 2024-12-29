@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/29 13:32:11 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/12/29 16:52:10 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,16 +97,28 @@ void	parser_destroy_command(t_command *cmd)
 	int	i;
 
 	if (!cmd)
-		return ;
+		return;
 	if (cmd->args)
 	{
 		i = 0;
 		while (cmd->args[i])
-			free(cmd->args[i++]);
+		{
+			free(cmd->args[i]);
+			cmd->args[i] = NULL;
+			i++;
+		}
 		free(cmd->args);
+		cmd->args = NULL;
 	}
-	parser_destroy_redirects(cmd->redirects);
+	if (cmd->redirects)
+	{
+		parser_destroy_redirects(cmd->redirects);
+		cmd->redirects = NULL;
+	}
 	if (cmd->pipe_next)
+	{
 		parser_destroy_command(cmd->pipe_next);
+		cmd->pipe_next = NULL;
+	}
 	free(cmd);
 }

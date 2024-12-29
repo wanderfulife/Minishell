@@ -26,12 +26,22 @@ void	shell_init(t_shell *shell, char **env)
 
 void	shell_cleanup(t_shell *shell)
 {
-	if (shell->env)
-		env_destroy(shell->env);
 	if (shell->current_cmd)
+	{
 		parser_destroy_command(shell->current_cmd);
+		shell->current_cmd = NULL;
+	}
+	if (shell->env)
+	{
+		env_destroy(shell->env);
+		shell->env = NULL;
+	}
 	terminal_restore(shell);
+	parser_close_heredoc();
 	rl_clear_history();
+	// Clean up readline's internal buffers
+	rl_clear_pending_input();
+	rl_cleanup_after_signal();
 }
 
 int	main(int argc, char **argv, char **env)

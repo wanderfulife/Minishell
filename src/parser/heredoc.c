@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JWander <jowander@student.42.fr>           +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/28 22:37:40 by JWander          ###   ########.fr       */
+/*   Updated: 2024/12/29 16:45:23 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,24 @@ int	parser_setup_heredoc(t_redirect *redir)
 
 void	parser_close_heredoc(void)
 {
-	unlink("/tmp/.heredoc_0");
+	char	*num;
+	char	*filename;
+	int		i;
+
+	i = 0;
+	while (i < 100)  // reasonable upper limit
+	{
+		num = ft_itoa(i);
+		if (!num)
+			return;
+		filename = ft_strjoin("/tmp/.heredoc_", num);
+		free(num);
+		if (!filename)
+			return;
+		unlink(filename);
+		free(filename);
+		i++;
+	}
 }
 
 int	parser_heredoc_count(t_command *cmd)

@@ -29,7 +29,7 @@ int	shell_process_input(t_shell *shell, char *input)
 
 	if (!input || !*input)
 		return (1);
-	expanded = env_expand_vars(ft_strdup(input), shell);
+	expanded = env_expand_vars(input, shell);
 	if (!expanded)
 		return (1);
 	tokens = lexer_tokenize(expanded);
@@ -42,8 +42,6 @@ int	shell_process_input(t_shell *shell, char *input)
 		return (1);
 	shell->last_exit_status = executor_run_command(shell->current_cmd, shell);
 	shell_free_command(shell);
-	shell->current_cmd = NULL;
-	rl_on_new_line();
 	return (1);
 }
 
@@ -57,14 +55,24 @@ int	shell_loop(t_shell *shell)
 		input = readline(PROMPT);
 		if (!input)
 		{
-			break ;
+			if (shell->current_cmd)
+			{
+				parser_destroy_command(shell->current_cmd);
+				shell->current_cmd = NULL;
+			}
+			break;
 		}
 		if (*input)
 			add_history(input);
 		if (!shell_process_input(shell, input))
 		{
 			free(input);
-			break ;
+			if (shell->current_cmd)
+			{
+				parser_destroy_command(shell->current_cmd);
+				shell->current_cmd = NULL;
+			}
+			break;
 		}
 		free(input);
 	}

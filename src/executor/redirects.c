@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirects.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JWander <jowander@student.42.fr>           +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/28 22:36:19 by JWander          ###   ########.fr       */
+/*   Updated: 2024/12/29 16:45:23 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -48,6 +48,7 @@ int	executor_setup_redirects(t_redirect *redirs)
 	t_redirect	*current;
 	int			status;
 	int			fd;
+	int			saved_fd;
 
 	status = 1;
 	current = redirs;
@@ -59,10 +60,13 @@ int	executor_setup_redirects(t_redirect *redirs)
 			fd = executor_open_file(current->file, current->type);
 		if (fd == -1)
 			return (0);
-		if (current->type == TOKEN_REDIR_IN || current->type == TOKEN_HEREDOC)
-			dup2(fd, STDIN_FILENO);
-		else
-			dup2(fd, STDOUT_FILENO);
+		saved_fd = (current->type == TOKEN_REDIR_IN || current->type == TOKEN_HEREDOC) ? 
+			STDIN_FILENO : STDOUT_FILENO;
+		if (dup2(fd, saved_fd) == -1)
+		{
+			close(fd);
+			return (0);
+		}
 		close(fd);
 		current = current->next;
 	}
@@ -72,9 +76,11 @@ int	executor_setup_redirects(t_redirect *redirs)
 int	executor_handle_heredoc(t_command *cmd)
 {
 	t_redirect	*redir;
+	int			status;
 
+	status = 1;
 	redir = cmd->redirects;
-	while (redir)
+	while (redir && status)
 	{
 		if (redir->type == TOKEN_HEREDOC)
 		{
@@ -83,5 +89,5 @@ int	executor_handle_heredoc(t_command *cmd)
 		}
 		redir = redir->next;
 	}
-	return (1);
+	return (status);
 }

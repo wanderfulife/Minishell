@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JWander <jowander@student.42.fr>           +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/28 22:36:29 by JWander          ###   ########.fr       */
+/*   Updated: 2024/12/29 17:20:08 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,8 +29,10 @@ static int	execute_command(t_command *cmd, t_shell *shell)
 		return (1);
 	if (pid == 0)
 		executor_child_process(cmd, shell);
-	waitpid(pid, &status, 0);
-	return (WEXITSTATUS(status));
+	while (wait(&status) != pid)
+		continue;
+	executor_exit_status(status, shell);
+	return (shell->last_exit_status);
 }
 
 int	executor_single_command(t_command *cmd, t_shell *shell)
@@ -42,7 +44,13 @@ int	executor_single_command(t_command *cmd, t_shell *shell)
 	saved_stdin = dup(STDIN_FILENO);
 	saved_stdout = dup(STDOUT_FILENO);
 	if (saved_stdin == -1 || saved_stdout == -1)
+	{
+		if (saved_stdin != -1)
+			close(saved_stdin);
+		if (saved_stdout != -1)
+			close(saved_stdout);
 		return (1);
+	}
 	if (!executor_setup_redirects(cmd->redirects))
 	{
 		close(saved_stdin);
@@ -130,5 +138,6 @@ int	executor_pipeline(t_command *cmd, t_shell *shell)
 	while (wait(&status) != last_pid)
 		continue ;
 	shell_reset_signals();
-	return (WEXITSTATUS(status));
+	executor_exit_status(status, shell);
+	return (shell->last_exit_status);
 }
