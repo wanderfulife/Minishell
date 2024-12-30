@@ -25,10 +25,13 @@ SRCS = src/main.c src/shell.c src/terminal.c \
 	   src/env/env_expand_utils.c \
 	   src/env/env_expand_utils2.c \
 	   src/env/env_utils.c \
-	   src/executor/executor.c \
+	   src/executor/executor_core.c \
+	   src/executor/executor_pipeline.c \
+	   src/executor/executor_pipeline_utils.c \
+	   src/executor/executor_single.c \
+	   src/executor/executor_child.c \
 	   src/executor/executor_utils.c \
 	   src/executor/executor_path.c \
-	   src/executor/executor_builtins.c \
 	   src/executor/pipes.c \
 	   src/executor/process.c \
 	   src/executor/redirects.c \

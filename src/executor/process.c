@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   process.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/29 13:32:11 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/12/30 17:08:42 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,28 +15,6 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <stdlib.h>
-
-static void	executor_child_process(t_command *cmd, t_shell *shell)
-{
-	char	*cmd_path;
-
-	if (!cmd->args[0])
-		exit(0);
-	cmd_path = executor_find_command(cmd->args[0], shell->env);
-	if (!cmd_path)
-	{
-		ft_putstr_fd("minishell: command not found: ", 2);
-		ft_putendl_fd(cmd->args[0], 2);
-		exit(127);
-	}
-	if (execve(cmd_path, cmd->args, shell->env) == -1)
-	{
-		ft_putstr_fd("minishell: execution failed: ", 2);
-		ft_putendl_fd(cmd->args[0], 2);
-		free(cmd_path);
-		exit(126);
-	}
-}
 
 pid_t	executor_fork_process(t_command *cmd, t_shell *shell)
 {
@@ -59,18 +37,6 @@ pid_t	executor_fork_process(t_command *cmd, t_shell *shell)
 		executor_child_process(cmd, shell);
 	}
 	return (pid);
-}
-
-void	executor_exit_status(int status, t_shell *shell)
-{
-	if (WIFEXITED(status))
-		shell->last_exit_status = WEXITSTATUS(status);
-	else if (WIFSIGNALED(status))
-	{
-		shell->last_exit_status = 128 + WTERMSIG(status);
-		if (WTERMSIG(status) == SIGQUIT)
-			ft_putendl_fd("Quit (core dumped)", 2);
-	}
 }
 
 int	executor_wait_all(int last_pid)

@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   executor_utils.c                                   :+:      :+:    :+:   */
+/*   executor_pipeline_utils.c                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/30 17:11:04 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/30 17:05:24 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,24 +14,40 @@
 #include "executor.h"
 #include <sys/wait.h>
 #include <unistd.h>
+#include <signal.h>
 
-int	executor_count_commands(t_command *cmd)
+void	executor_handle_child_pipes(int prev_pipe, int pipes[2], t_command *cmd)
 {
-	int	count;
-
-	count = 0;
-	while (cmd)
+	if (prev_pipe != STDIN_FILENO)
 	{
-		count++;
-		cmd = cmd->pipe_next;
+		dup2(prev_pipe, STDIN_FILENO);
+		close(prev_pipe);
 	}
-	return (count);
+	if (cmd->pipe_next)
+	{
+		close(pipes[0]);
+		dup2(pipes[1], STDOUT_FILENO);
+		close(pipes[1]);
+	}
 }
 
-void	executor_reset_fds(int saved_stdin, int saved_stdout)
+void	executor_parent_process(int *prev_pipe, int pipes[2], t_command *cmd)
 {
-	dup2(saved_stdin, STDIN_FILENO);
-	dup2(saved_stdout, STDOUT_FILENO);
-	close(saved_stdin);
-	close(saved_stdout);
+	if (*prev_pipe != STDIN_FILENO)
+		close(*prev_pipe);
+	if (cmd->pipe_next)
+	{
+		close(pipes[1]);
+		*prev_pipe = pipes[0];
+	}
+}
+
+void	wait_for_last_process(pid_t last_pid, t_shell *shell)
+{
+	int	status;
+
+	while (wait(&status) != last_pid)
+		continue ;
+	shell_reset_signals();
+	executor_exit_status(status, shell);
 }

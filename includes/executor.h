@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/11/04 16:13:04 by JoWander         ###   ########.fr       */
+/*   Updated: 2024/12/30 17:07:47 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,11 +21,28 @@
 
 typedef struct s_shell	t_shell;
 
-/* executor.c */
+/* executor_core.c */
 int						executor_run_command(t_command *cmd, t_shell *shell);
 void					executor_cleanup(t_command *cmd);
 int						executor_handle_builtin(t_command *cmd, t_shell *shell);
 int						executor_is_builtin(char *cmd);
+
+/* executor_pipeline.c */
+int						executor_pipeline(t_command *cmd, t_shell *shell);
+
+/* executor_pipeline_utils.c */
+void					executor_handle_child_pipes(int prev_pipe, int pipes[2],
+							t_command *cmd);
+void					executor_parent_process(int *prev_pipe, int pipes[2],
+							t_command *cmd);
+void					wait_for_last_process(pid_t last_pid, t_shell *shell);
+
+/* executor_child.c */
+void					executor_child_process(t_command *cmd, t_shell *shell);
+void					executor_exit_status(int status, t_shell *shell);
+
+/* executor_single.c */
+int						executor_single_command(t_command *cmd, t_shell *shell);
 
 /* executor_utils.c */
 char					*executor_find_command(char *cmd, char **envp);
@@ -33,9 +50,9 @@ int						executor_count_commands(t_command *cmd);
 void					executor_close_pipes(t_command *cmd);
 void					executor_reset_fds(int saved_stdin, int saved_stdout);
 
+/* executor_path.c */
 char					*join_path(char *dir, char *cmd);
 char					*check_paths(char **paths, char *cmd);
-char					*executor_find_command(char *cmd, char **envp);
 void					free_paths(char **paths);
 
 /* pipes.c */
@@ -52,16 +69,9 @@ int						executor_open_file(char *file, int type);
 
 int						handle_file_not_found(char *file);
 int						handle_open_error(char *file);
-void					executor_close_redirects(t_redirect *redirs);
 
 /* process.c */
 pid_t					executor_fork_process(t_command *cmd, t_shell *shell);
 int						executor_wait_all(int last_pid);
-void					executor_exit_status(int status, t_shell *shell);
-int						executor_execute(t_command *cmd, t_shell *shell);
 
-void					executor_parent_process(int *prev_pipe, int pipes[2],
-							t_command *cmd);
-int						executor_single_command(t_command *cmd, t_shell *shell);
-int						executor_pipeline(t_command *cmd, t_shell *shell);
 #endif
