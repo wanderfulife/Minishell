@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   exit.c                                             :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JWander <jowander@student.42.fr>           +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/28 22:37:21 by JWander          ###   ########.fr       */
+/*   Updated: 2024/12/30 17:41:59 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,7 +44,9 @@ static int	is_valid_number(const char *str)
 	i = 0;
 	while (is_space(str[i]))
 		i++;
-	if (str[i] == '-' || str[i] == '+')
+	if (str[i] == '-')
+		return (0);
+	if (str[i] == '+')
 		i++;
 	if (!str[i])
 		return (0);
