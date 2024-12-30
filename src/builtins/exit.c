@@ -6,7 +6,7 @@
 /*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/30 17:41:59 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/30 17:45:22 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,9 +44,7 @@ static int	is_valid_number(const char *str)
 	i = 0;
 	while (is_space(str[i]))
 		i++;
-	if (str[i] == '-')
-		return (0);
-	if (str[i] == '+')
+	if (str[i] == '-' || str[i] == '+')
 		i++;
 	if (!str[i])
 		return (0);
