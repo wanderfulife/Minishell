@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_expand.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wander <wander@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/30 15:27:05 by wander           ###   ########.fr       */
+/*   Updated: 2024/12/30 16:37:53 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -14,74 +14,55 @@
 #include "minishell.h"
 #include <stdlib.h>
 
-static char	*env_replace_var(char *str, int start, int len, char *value)
-{
-	char	*new_str;
-	int		new_len;
-	int		value_len;
-
-	if (value)
-		value_len = ft_strlen(value);
-	else
-		value_len = 0;
-	new_len = ft_strlen(str) - len + value_len;
-	new_str = (char *)malloc(sizeof(char) * (new_len + 1));
-	if (!new_str)
-		return (NULL);
-	ft_strlcpy(new_str, str, start + 1);
-	if (value)
-		ft_strlcpy(new_str + start, value, value_len + 1);
-	ft_strlcpy(new_str + start + value_len, str + start + len, ft_strlen(str
-			+ start + len) + 1);
-	return (new_str);
-}
-
-char	*env_expand_exit_status(char *str, t_shell *shell)
+static char	*handle_exit_status_expansion(char *exp, int i, t_shell *shell)
 {
 	char	*status_str;
-	char	*new_str;
-	int		i;
+	char	*str;
 
-	i = 0;
-	while (str[i])
-	{
-		if (str[i] == '$' && str[i + 1] == '?')
-		{
-			status_str = ft_itoa(shell->last_exit_status);
-			if (!status_str)
-				return (NULL);
-			new_str = env_replace_var(str, i, 2, status_str);
-			free(status_str);
-			free(str);
-			return (new_str);
-		}
-		i++;
-	}
+	status_str = ft_itoa(shell->last_exit_status);
+	if (!status_str)
+		return (NULL);
+	str = env_replace_var(exp, i, 2, status_str);
+	free(status_str);
 	return (str);
 }
 
-char	*get_var_value(char *var_name, t_shell *shell)
+static char	*process_expansion(char *exp, int *i, t_shell *shell)
 {
-	if (ft_strncmp(var_name, "?", 2) == 0)
-		return (ft_itoa(shell->last_exit_status));
-	return (env_get_value(var_name, shell->env));
+	char	*str;
+
+	if (exp[*i] == '$' && exp[*i + 1] && exp[*i + 1] != ' '
+		&& exp[*i + 1] != '\'' && exp[*i + 1] != '"')
+	{
+		if (exp[*i + 1] == '?')
+			return (handle_exit_status_expansion(exp, *i, shell));
+		str = expand_variable(exp, *i, shell);
+		if (!str)
+			return (NULL);
+		return (str);
+	}
+	(*i)++;
+	return (exp);
 }
 
-char	*expand_variable(char *expanded, int i, t_shell *shell)
+static char	*process_char(char *exp, int *i, int *in_single_quote,
+	t_shell *shell)
 {
-	char	*var_name;
-	char	*var_value;
 	char	*new_str;
 
-	var_name = env_get_var_name(expanded + i + 1);
-	if (!var_name)
-		return (NULL);
-	var_value = get_var_value(var_name, shell);
-	new_str = env_replace_var(expanded, i, ft_strlen(var_name) + 1, var_value);
-	if (var_value && ft_strncmp(var_name, "?", 2) == 0)
-		free(var_value);
-	free(var_name);
-	return (new_str);
+	*in_single_quote = handle_single_quotes(exp[*i], *in_single_quote);
+	if (!*in_single_quote)
+	{
+		new_str = process_expansion(exp, i, shell);
+		exp = handle_expansion_result(exp, new_str);
+		if (!exp)
+			return (NULL);
+		if (new_str != exp)
+			return (exp);
+	}
+	else
+		(*i)++;
+	return (exp);
 }
 
 char	*env_expand_vars(char *str, t_shell *shell)
@@ -89,42 +70,17 @@ char	*env_expand_vars(char *str, t_shell *shell)
 	char	*exp;
 	int		i;
 	int		in_single_quote;
-	char	*status_str;
 
-	if (!str)
-		return (NULL);
-	exp = ft_strdup(str);
+	exp = init_expansion(str);
 	if (!exp)
 		return (NULL);
 	i = 0;
 	in_single_quote = 0;
 	while (exp[i])
 	{
-		in_single_quote = handle_single_quotes(exp[i], in_single_quote);
-		if (!in_single_quote && exp[i] == '$' && exp[i + 1] && exp[i + 1] != ' '
-			&& exp[i + 1] != '\'' && exp[i + 1] != '"')
-		{
-			if (exp[i + 1] == '?')
-			{
-				status_str = ft_itoa(shell->last_exit_status);
-				if (!status_str)
-					return (NULL);
-				str = env_replace_var(exp, i, 2, status_str);
-				free(status_str);
-				free(exp);
-				if (!str)
-					return (NULL);
-				exp = str;
-				continue ;
-			}
-			str = expand_variable(exp, i, shell);
-			free(exp);
-			if (!str)
-				return (NULL);
-			exp = str;
-			continue ;
-		}
-		i++;
+		exp = process_char(exp, &i, &in_single_quote, shell);
+		if (!exp)
+			return (NULL);
 	}
 	return (exp);
 }

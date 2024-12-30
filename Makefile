@@ -23,6 +23,7 @@ SRCS = src/main.c src/shell.c src/terminal.c \
 	   src/env/env.c \
 	   src/env/env_expand.c \
 	   src/env/env_expand_utils.c \
+	   src/env/env_expand_utils2.c \
 	   src/env/env_utils.c \
 	   src/executor/executor.c \
 	   src/executor/executor_utils.c \

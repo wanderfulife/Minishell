@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_expand_utils.c                                 :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/10/31 15:58:06 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/31 15:58:59 by JoWander         ###   ########.fr       */
+/*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
+/*   Updated: 2024/12/30 16:33:42 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,9 +36,24 @@ char	*env_get_var_name(char *str)
 	return (name);
 }
 
-int	handle_single_quotes(char c, int in_single_quote)
+char	*env_replace_var(char *str, int start, int len, char *value)
 {
-	if (c == '\'')
-		return (!in_single_quote);
-	return (in_single_quote);
+	char	*new_str;
+	int		new_len;
+	int		value_len;
+
+	if (value)
+		value_len = ft_strlen(value);
+	else
+		value_len = 0;
+	new_len = ft_strlen(str) - len + value_len;
+	new_str = (char *)malloc(sizeof(char) * (new_len + 1));
+	if (!new_str)
+		return (NULL);
+	ft_strlcpy(new_str, str, start + 1);
+	if (value)
+		ft_strlcpy(new_str + start, value, value_len + 1);
+	ft_strlcpy(new_str + start + value_len, str + start + len, ft_strlen(str
+			+ start + len) + 1);
+	return (new_str);
 }
