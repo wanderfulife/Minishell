@@ -6,7 +6,7 @@
 /*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/30 17:48:37 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/30 18:05:09 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,8 +34,9 @@ int	executor_open_file(char *file, int type)
 
 	if (type == TOKEN_REDIR_IN && access(file, F_OK) == -1)
 	{
+		ft_putstr_fd("minishell: ", 2);
 		ft_putstr_fd(file, 2);
-		ft_putstr_fd(": No such file or directory\n", 2);
+		ft_putendl_fd(": No such file or directory", 2);
 		return (-1);
 	}
 	flags = get_open_flags(type);
@@ -43,7 +44,7 @@ int	executor_open_file(char *file, int type)
 		return (-1);
 	fd = open(file, flags, 0644);
 	if (fd == -1)
-		return (-1);
+		return (handle_open_error(file));
 	return (fd);
 }
 

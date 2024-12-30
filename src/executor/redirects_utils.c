@@ -6,7 +6,7 @@
 /*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 16:02:21 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/30 15:44:44 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/30 18:05:09 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,7 +24,14 @@ int	handle_file_not_found(char *file)
 
 int	handle_open_error(char *file)
 {
-	(void)file;
+	ft_putstr_fd("minishell: ", 2);
+	ft_putstr_fd(file, 2);
+	if (access(file, F_OK) == -1)
+		ft_putendl_fd(": No such file or directory", 2);
+	else if (access(file, W_OK) == -1 || errno == EACCES)
+		ft_putendl_fd(": Permission denied", 2);
+	else
+		ft_putendl_fd(": Error opening file", 2);
 	return (-1);
 }
 
