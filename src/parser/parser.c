@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wander <wander@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/30 15:26:42 by wander           ###   ########.fr       */
+/*   Updated: 2024/12/30 16:10:50 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -90,35 +90,4 @@ t_command	*parser_parse_tokens(t_token *tokens)
 	current = tokens;
 	cmd = parser_handle_pipe(&current);
 	return (cmd);
-}
-
-void	parser_destroy_command(t_command *cmd)
-{
-	int	i;
-
-	if (!cmd)
-		return ;
-	if (cmd->args)
-	{
-		i = 0;
-		while (cmd->args[i])
-		{
-			free(cmd->args[i]);
-			cmd->args[i] = NULL;
-			i++;
-		}
-		free(cmd->args);
-		cmd->args = NULL;
-	}
-	if (cmd->redirects)
-	{
-		parser_destroy_redirects(cmd->redirects);
-		cmd->redirects = NULL;
-	}
-	if (cmd->pipe_next)
-	{
-		parser_destroy_command(cmd->pipe_next);
-		cmd->pipe_next = NULL;
-	}
-	free(cmd);
 }

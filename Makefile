@@ -39,6 +39,7 @@ SRCS = src/main.c src/shell.c src/terminal.c \
 	   src/parser/heredoc.c \
 	   src/parser/parser.c \
 	   src/parser/parser_utils.c \
+	   src/parser/parser_cleanup.c \
 	   src/parser/redirections.c \
 	   src/signals/signals.c
 
