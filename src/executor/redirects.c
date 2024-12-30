@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirects.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: wander <wander@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/29 16:45:23 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/30 15:27:36 by wander           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,8 +60,8 @@ int	executor_setup_redirects(t_redirect *redirs)
 			fd = executor_open_file(current->file, current->type);
 		if (fd == -1)
 			return (0);
-		saved_fd = (current->type == TOKEN_REDIR_IN || current->type == TOKEN_HEREDOC) ? 
-			STDIN_FILENO : STDOUT_FILENO;
+		saved_fd = (current->type == TOKEN_REDIR_IN
+				|| current->type == TOKEN_HEREDOC) ? STDIN_FILENO : STDOUT_FILENO;
 		if (dup2(fd, saved_fd) == -1)
 		{
 			close(fd);

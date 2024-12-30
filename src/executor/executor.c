@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.c                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: wander <wander@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/29 17:20:08 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/30 15:27:20 by wander           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ static int	execute_command(t_command *cmd, t_shell *shell)
 	if (pid == 0)
 		executor_child_process(cmd, shell);
 	while (wait(&status) != pid)
-		continue;
+		continue ;
 	executor_exit_status(status, shell);
 	return (shell->last_exit_status);
 }

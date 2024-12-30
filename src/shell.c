@@ -3,7 +3,7 @@
 /*                                                        :::      ::::::::   */
 /*   shell.c                                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JoWander <jowander@student.42.fr>           +#+  +:+      
+/*   By: JoWander <jowander@student.42.fr>           +#+  +:+
 	+#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
@@ -60,7 +60,7 @@ int	shell_loop(t_shell *shell)
 				parser_destroy_command(shell->current_cmd);
 				shell->current_cmd = NULL;
 			}
-			break;
+			break ;
 		}
 		if (*input)
 			add_history(input);
@@ -72,7 +72,7 @@ int	shell_loop(t_shell *shell)
 				parser_destroy_command(shell->current_cmd);
 				shell->current_cmd = NULL;
 			}
-			break;
+			break ;
 		}
 		free(input);
 	}

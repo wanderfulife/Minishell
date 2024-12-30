@@ -39,7 +39,6 @@ void	shell_cleanup(t_shell *shell)
 	terminal_restore(shell);
 	parser_close_heredoc();
 	rl_clear_history();
-	// Clean up readline's internal buffers
 	rl_clear_pending_input();
 	rl_cleanup_after_signal();
 }

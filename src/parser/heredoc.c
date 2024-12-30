@@ -3,18 +3,18 @@
 /*                                                        :::      ::::::::   */
 /*   heredoc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: wander <wander@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/29 16:45:23 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/30 15:26:24 by wander           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "parser.h"
 #include <fcntl.h>
-#include <unistd.h>
-#include <readline/readline.h>
 #include <readline/history.h>
+#include <readline/readline.h>
+#include <unistd.h>
 
 static char	*get_heredoc_filename(void)
 {
@@ -87,15 +87,15 @@ void	parser_close_heredoc(void)
 	int		i;
 
 	i = 0;
-	while (i < 100)  // reasonable upper limit
+	while (i < 100)
 	{
 		num = ft_itoa(i);
 		if (!num)
-			return;
+			return ;
 		filename = ft_strjoin("/tmp/.heredoc_", num);
 		free(num);
 		if (!filename)
-			return;
+			return ;
 		unlink(filename);
 		free(filename);
 		i++;

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.c                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
+/*   By: wander <wander@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/29 16:52:10 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/30 15:26:42 by wander           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -97,7 +97,7 @@ void	parser_destroy_command(t_command *cmd)
 	int	i;
 
 	if (!cmd)
-		return;
+		return ;
 	if (cmd->args)
 	{
 		i = 0;
