@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirects_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JWander <jowander@student.42.fr>           +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/11/04 16:02:21 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/28 22:39:14 by JWander          ###   ########.fr       */
+/*   Updated: 2024/12/30 15:44:44 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,4 +41,23 @@ void	executor_close_redirects(t_redirect *redirs)
 			close(fd);
 		current = current->next;
 	}
+}
+
+int	executor_handle_heredoc(t_command *cmd)
+{
+	t_redirect	*redir;
+	int			status;
+
+	status = 1;
+	redir = cmd->redirects;
+	while (redir && status)
+	{
+		if (redir->type == TOKEN_HEREDOC)
+		{
+			if (!parser_setup_heredoc(redir))
+				return (0);
+		}
+		redir = redir->next;
+	}
+	return (status);
 }

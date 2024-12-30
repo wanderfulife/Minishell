@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   redirects.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: wander <wander@student.42.fr>              +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/30 15:27:36 by wander           ###   ########.fr       */
+/*   Updated: 2024/12/30 15:44:44 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,51 +43,45 @@ int	executor_open_file(char *file, int type)
 	return (fd);
 }
 
+static int	get_saved_fd(int type)
+{
+	if (type == TOKEN_REDIR_IN || type == TOKEN_HEREDOC)
+		return (STDIN_FILENO);
+	return (STDOUT_FILENO);
+}
+
+static int	handle_single_redirect(t_redirect *current)
+{
+	int	fd;
+	int	saved_fd;
+
+	if (current->type == TOKEN_HEREDOC)
+		fd = open(current->file, O_RDONLY);
+	else
+		fd = executor_open_file(current->file, current->type);
+	if (fd == -1)
+		return (0);
+	saved_fd = get_saved_fd(current->type);
+	if (dup2(fd, saved_fd) == -1)
+	{
+		close(fd);
+		return (0);
+	}
+	close(fd);
+	return (1);
+}
+
 int	executor_setup_redirects(t_redirect *redirs)
 {
 	t_redirect	*current;
 	int			status;
-	int			fd;
-	int			saved_fd;
 
 	status = 1;
 	current = redirs;
 	while (current && status)
 	{
-		if (current->type == TOKEN_HEREDOC)
-			fd = open(current->file, O_RDONLY);
-		else
-			fd = executor_open_file(current->file, current->type);
-		if (fd == -1)
-			return (0);
-		saved_fd = (current->type == TOKEN_REDIR_IN
-				|| current->type == TOKEN_HEREDOC) ? STDIN_FILENO : STDOUT_FILENO;
-		if (dup2(fd, saved_fd) == -1)
-		{
-			close(fd);
-			return (0);
-		}
-		close(fd);
+		status = handle_single_redirect(current);
 		current = current->next;
-	}
-	return (status);
-}
-
-int	executor_handle_heredoc(t_command *cmd)
-{
-	t_redirect	*redir;
-	int			status;
-
-	status = 1;
-	redir = cmd->redirects;
-	while (redir && status)
-	{
-		if (redir->type == TOKEN_HEREDOC)
-		{
-			if (!parser_setup_heredoc(redir))
-				return (0);
-		}
-		redir = redir->next;
 	}
 	return (status);
 }

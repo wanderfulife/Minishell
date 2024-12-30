@@ -6,16 +6,49 @@
 /*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/29 17:10:54 by jcohen           ###   ########.fr       */
+/*   Updated: 2024/12/30 15:51:14 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "builtins.h"
 #include <unistd.h>
 
-char	*get_home_dir(t_shell *shell)
+static char	*handle_home_and_dash(t_shell *shell, int mode)
 {
-	return (env_get_value("HOME", shell->env));
+	char	*oldpwd;
+
+	if (mode == 0)
+		return (env_get_value("HOME", shell->env));
+	oldpwd = env_get_value("OLDPWD", shell->env);
+	if (!oldpwd)
+		return (NULL);
+	ft_putendl_fd(oldpwd, 1);
+	return (oldpwd);
+}
+
+static char	*get_cd_path(char **args, t_shell *shell)
+{
+	char	*home;
+	char	*path;
+
+	if (!args[1])
+		return (handle_home_and_dash(shell, 0));
+	if (args[2])
+		return (NULL);
+	if (ft_strncmp(args[1], "-", 2) == 0)
+		return (handle_home_and_dash(shell, 1));
+	if (args[1][0] == '~')
+	{
+		home = env_get_value("HOME", shell->env);
+		if (!home || args[1][1] == '\0')
+			return (home);
+		if (args[1][1] == '/')
+		{
+			path = ft_strjoin(home, args[1] + 1);
+			return (path);
+		}
+	}
+	return (args[1]);
 }
 
 static void	update_pwd_vars(t_shell *shell)
@@ -30,49 +63,13 @@ static void	update_pwd_vars(t_shell *shell)
 		env_set(shell, "PWD", cwd);
 }
 
-int	print_cd_error(char *message, char *path)
+static int	print_cd_error(char *message, char *path)
 {
 	ft_putstr_fd("minishell: cd: ", 2);
 	if (path)
 		ft_putstr_fd(path, 2);
 	ft_putendl_fd(message, 2);
 	return (1);
-}
-
-char	*get_cd_path(char **args, t_shell *shell)
-{
-	char	*oldpwd;
-	char	*home;
-	char	*path;
-
-	if (!args[1])
-		return (get_home_dir(shell));
-	if (args[2])
-		return (NULL);
-	if (ft_strncmp(args[1], "-", 2) == 0)
-	{
-		oldpwd = env_get_value("OLDPWD", shell->env);
-		if (!oldpwd)
-			return (NULL);
-		ft_putendl_fd(oldpwd, 1);
-		return (oldpwd);
-	}
-	if (args[1][0] == '~')
-	{
-		home = get_home_dir(shell);
-		if (!home)
-			return (NULL);
-		if (args[1][1] == '\0')
-			return (home);
-		if (args[1][1] == '/')
-		{
-			path = ft_strjoin(home, args[1] + 1);
-			if (!path)
-				return (NULL);
-			return (path);
-		}
-	}
-	return (args[1]);
 }
 
 int	builtin_cd(char **args, t_shell *shell)
