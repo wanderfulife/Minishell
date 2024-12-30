@@ -12,6 +12,7 @@
 /* ************************************************************************** */
 
 #include "minishell.h"
+#include <signal.h>
 
 static void	shell_free_command(t_shell *shell)
 {
@@ -45,6 +46,16 @@ int	shell_process_input(t_shell *shell, char *input)
 	return (1);
 }
 
+static void	shell_cleanup_and_break(t_shell *shell, char *input)
+{
+	free(input);
+	if (shell->current_cmd)
+	{
+		parser_destroy_command(shell->current_cmd);
+		shell->current_cmd = NULL;
+	}
+}
+
 int	shell_loop(t_shell *shell)
 {
 	char	*input;
@@ -55,23 +66,14 @@ int	shell_loop(t_shell *shell)
 		input = readline(PROMPT);
 		if (!input)
 		{
-			if (shell->current_cmd)
-			{
-				parser_destroy_command(shell->current_cmd);
-				shell->current_cmd = NULL;
-			}
+			shell_cleanup_and_break(shell, NULL);
 			break ;
 		}
 		if (*input)
 			add_history(input);
 		if (!shell_process_input(shell, input))
 		{
-			free(input);
-			if (shell->current_cmd)
-			{
-				parser_destroy_command(shell->current_cmd);
-				shell->current_cmd = NULL;
-			}
+			shell_cleanup_and_break(shell, input);
 			break ;
 		}
 		free(input);

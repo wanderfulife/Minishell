@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jowander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/29 16:26:00 by jowander         ###   ########.fr       */
+/*   Updated: 2024/12/30 16:19:04 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -79,8 +79,8 @@ char	*env_get_value(char *name, char **env)
 int	env_set(t_shell *shell, char *var, char *value)
 {
 	char	*name;
-	int		index;
 	char	*equals_pos;
+	int		index;
 
 	name = env_get_name(var);
 	if (!name)
@@ -99,12 +99,9 @@ int	env_set(t_shell *shell, char *var, char *value)
 		free(name);
 		return (shell->env[index] != NULL);
 	}
-	else
-	{
-		shell->env = env_add_entry(shell->env, env_create_entry(name, value));
-		free(name);
-		return (shell->env != NULL);
-	}
+	shell->env = env_add_entry(shell->env, env_create_entry(name, value));
+	free(name);
+	return (shell->env != NULL);
 }
 
 int	env_unset(t_shell *shell, char *name)
