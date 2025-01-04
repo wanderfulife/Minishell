@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env_utils.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jowander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/29 16:24:59 by jowander         ###   ########.fr       */
+/*   Updated: 2025/01/04 12:21:36 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -106,9 +106,18 @@ char	**env_remove_entry(char **env, int index)
 	while (i < size)
 	{
 		if (i != index)
-			new_env[j++] = env[i];
-		else
-			free(env[i]);
+		{
+			new_env[j] = ft_strdup(env[i]);
+			if (!new_env[j])
+			{
+				while (--j >= 0)
+					free(new_env[j]);
+				free(new_env);
+				return (NULL);
+			}
+			j++;
+		}
+		free(env[i]);
 		i++;
 	}
 	new_env[j] = NULL;

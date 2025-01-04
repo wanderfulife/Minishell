@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser_utils.c                                     :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/29 13:32:11 by JoWander         ###   ########.fr       */
+/*   Updated: 2025/01/04 12:21:36 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -57,7 +57,17 @@ char	**parser_create_args(t_token *tokens, int count)
 			continue ;
 		}
 		if (current->type == TOKEN_WORD)
-			args[i++] = ft_strdup(current->content);
+		{
+			args[i] = ft_strdup(current->content);
+			if (!args[i])
+			{
+				while (--i >= 0)
+					free(args[i]);
+				free(args);
+				return (NULL);
+			}
+			i++;
+		}
 		current = current->next;
 	}
 	args[i] = NULL;

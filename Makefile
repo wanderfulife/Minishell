@@ -30,6 +30,7 @@ SRCS = src/main.c src/shell.c src/terminal.c \
 	   src/executor/executor_pipeline_utils.c \
 	   src/executor/executor_single.c \
 	   src/executor/executor_child.c \
+	   src/executor/executor_errors.c \
 	   src/executor/executor_utils.c \
 	   src/executor/executor_path.c \
 	   src/executor/pipes.c \

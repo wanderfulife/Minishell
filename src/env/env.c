@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.c                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jowander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/31 14:06:29 by jowander         ###   ########.fr       */
+/*   Updated: 2025/01/04 12:21:36 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,7 +34,9 @@ char	**env_init(char **original_env)
 		new_env[i] = ft_strdup(original_env[i]);
 		if (!new_env[i])
 		{
-			env_destroy(new_env);
+			while (--i >= 0)
+				free(new_env[i]);
+			free(new_env);
 			return (NULL);
 		}
 		i++;

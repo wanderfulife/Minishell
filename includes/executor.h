@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   executor.h                                         :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jowander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/31 14:06:07 by jowander         ###   ########.fr       */
+/*   Updated: 2025/01/04 12:53:22 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,5 +73,11 @@ int						handle_open_error(char *file);
 /* process.c */
 pid_t					executor_fork_process(t_command *cmd, t_shell *shell);
 int						executor_wait_all(int last_pid);
+
+/* Error handling functions */
+void					handle_command_not_found(char *cmd, t_shell *shell,
+							t_command *command);
+void					handle_execution_error(char *cmd, char *path,
+							t_shell *shell, t_command *command);
 
 #endif
