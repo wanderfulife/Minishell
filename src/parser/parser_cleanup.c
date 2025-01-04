@@ -6,7 +6,7 @@
 /*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2025/01/04 12:21:36 by jcohen           ###   ########.fr       */
+/*   Updated: 2025/01/04 13:29:37 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -41,6 +41,14 @@ static void	parser_cleanup_pipe(t_command *pipe_next)
 	if (!pipe_next)
 		return ;
 	parser_destroy_command(pipe_next);
+}
+
+char	**parser_handle_arg_error(char **args, int i)
+{
+	while (--i >= 0)
+		free(args[i]);
+	free(args);
+	return (NULL);
 }
 
 void	parser_destroy_command(t_command *cmd)

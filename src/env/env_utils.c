@@ -6,7 +6,7 @@
 /*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2025/01/04 12:21:36 by jcohen           ###   ########.fr       */
+/*   Updated: 2025/01/04 13:54:13 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -84,43 +84,6 @@ char	**env_add_entry(char **env, char *entry)
 	}
 	new_env[i] = entry;
 	new_env[i + 1] = NULL;
-	free(env);
-	return (new_env);
-}
-
-char	**env_remove_entry(char **env, int index)
-{
-	char	**new_env;
-	int		size;
-	int		i;
-	int		j;
-
-	size = 0;
-	while (env[size])
-		size++;
-	new_env = (char **)malloc(sizeof(char *) * size);
-	if (!new_env)
-		return (NULL);
-	i = 0;
-	j = 0;
-	while (i < size)
-	{
-		if (i != index)
-		{
-			new_env[j] = ft_strdup(env[i]);
-			if (!new_env[j])
-			{
-				while (--j >= 0)
-					free(new_env[j]);
-				free(new_env);
-				return (NULL);
-			}
-			j++;
-		}
-		free(env[i]);
-		i++;
-	}
-	new_env[j] = NULL;
 	free(env);
 	return (new_env);
 }

@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   parser.h                                           :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: JoWander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/10/29 13:32:11 by JoWander         ###   ########.fr       */
+/*   Updated: 2025/01/04 13:33:25 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -33,7 +33,6 @@ typedef struct s_command
 /* parser.c */
 t_command	*parser_create_command(void);
 t_command	*parser_parse_tokens(t_token *tokens);
-void		parser_destroy_command(t_command *cmd);
 
 /* parser_utils.c */
 int			parser_count_args(t_token *tokens);
@@ -51,5 +50,9 @@ int			parser_handle_heredoc(t_command *cmd, char *delim);
 int			parser_setup_heredoc(t_redirect *redir);
 void		parser_close_heredoc(void);
 int			parser_heredoc_count(t_command *cmd);
+
+/* parser_cleanup.c */
+void		parser_destroy_command(t_command *cmd);
+char		**parser_handle_arg_error(char **args, int i);
 
 #endif
