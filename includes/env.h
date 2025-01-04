@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   env.h                                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: jowander <jowander@student.42.fr>          +#+  +:+       +#+        */
+/*   By: jcohen <jcohen@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 10:00:00 by JoWander          #+#    #+#             */
-/*   Updated: 2024/12/31 14:06:00 by jowander         ###   ########.fr       */
+/*   Updated: 2025/01/04 14:26:10 by jcohen           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,9 +20,7 @@ typedef struct s_shell	t_shell;
 /* env.c */
 char					**env_init(char **original_env);
 void					env_destroy(char **env);
-char					*env_get_value(char *name, char **env);
 int						env_set(t_shell *shell, char *var, char *value);
-int						env_unset(t_shell *shell, char *name);
 
 /* env_utils.c */
 char					*env_get_name(char *var);
@@ -30,6 +28,12 @@ char					*env_create_entry(char *name, char *value);
 int						env_find_index(char *name, char **env);
 char					**env_add_entry(char **env, char *entry);
 char					**env_remove_entry(char **env, int index);
+
+/* env_utils2.c */
+char					*get_value_from_var(char *var, char *value);
+char					**free_env_array(char **env, int size);
+int						env_unset(t_shell *shell, char *name);
+char					*env_get_value(char *name, char **env);
 
 /* env_expand.c */
 char					*env_expand_vars(char *str, t_shell *shell);

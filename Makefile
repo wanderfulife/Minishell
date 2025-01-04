@@ -25,6 +25,7 @@ SRCS = src/main.c src/shell.c src/terminal.c \
 	   src/env/env_expand_utils.c \
 	   src/env/env_expand_utils2.c \
 	   src/env/env_utils.c \
+	   src/env/env_utils2.c \
 	   src/env/env_remove.c \
 	   src/executor/executor_core.c \
 	   src/executor/executor_pipeline.c \
