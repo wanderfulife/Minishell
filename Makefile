@@ -65,10 +65,6 @@ LDFLAGS += -L$(LIBFT_DIR) -lftprintf -L/usr/lib -lreadline
 all: libft-init $(NAME)
 
 libft-init:
-	@if ! command -v git &> /dev/null; then \
-		echo "$(RED)Error: git is not installed$(RESET)"; \
-		exit 1; \
-	fi
 	@if [ ! -d "$(LIBFT_DIR)" ] || [ ! -f "$(LIBFT_DIR)/Makefile" ]; then \
 		echo "$(YELLOW)Initializing and updating git submodules...$(RESET)"; \
 		git submodule update --init --recursive; \
