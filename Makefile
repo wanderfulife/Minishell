@@ -3,12 +3,12 @@ YELLOW = \033[0;33m
 RED = \033[0;31m
 BLUE = \033[0;34m
 RESET = \033[0m
-
 NAME = minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
+SETUP_SCRIPT = ./setup.sh
 
-.PHONY: all clean fclean re
+.PHONY: all clean fclean re libft-init
 
 # Source files
 SRCS = src/main.c src/shell.c src/terminal.c \
@@ -63,7 +63,15 @@ CFLAGS += -I$(LIBFT_DIR)/includes -Iincludes -I/usr/include/readline
 # Linker flags for libft and readline
 LDFLAGS += -L$(LIBFT_DIR) -lftprintf -L/usr/lib -lreadline
 
-all: $(NAME)
+all: libft-init $(NAME)
+
+libft-init:
+	@if [ ! -d "$(LIBFT_DIR)" ] || [ ! -f "$(LIBFT_DIR)/Makefile" ]; then \
+		echo "$(YELLOW)Running setup script...$(RESET)"; \
+		chmod +x $(SETUP_SCRIPT); \
+		./$(SETUP_SCRIPT); \
+		echo "$(GREEN)Setup complete!$(RESET)"; \
+	fi
 
 $(NAME): $(OBJS) $(LIBFT)
 	@$(CC) $(CFLAGS) $(OBJS) $(LDFLAGS) -o $(NAME)
@@ -81,7 +89,7 @@ $(OBJS_DIR)/%.o: %.c
 
 $(LIBFT):
 	@echo "$(YELLOW)Compiling libft...$(RESET)"
-	make -C $(LIBFT_DIR)
+	@make -C $(LIBFT_DIR)
 	@echo "$(GREEN)libft compilation done!$(RESET)"
 
 clean:
@@ -101,7 +109,5 @@ fclean: clean
 	fi
 
 re: fclean all
-
-.PHONY: all clean fclean re
 
 -include $(DEPS)
