@@ -1,0 +1,535 @@
+/* Define the shell structure first */
+typedef struct s_shell
+{
+	char				**env;
+	int					last_exit_status;
+	int					in_heredoc;
+	struct termios		original_term;
+	struct s_command	*current_cmd;
+}	
+
+// Main Function - Entry point of the shell
+int main(int argc, char **argv, char **env)
+{
+    t_shell shell;        // Main shell structure to hold shell state
+    int     status;       // To store exit status
+
+    // Ignore unused parameters
+    (void)argc;
+    (void)argv;
+    
+    shell_init(&shell, env);  // Initialize shell with environment variables
+    
+    // Check if environment initialization failed
+    if (!shell.env)
+    {
+        ft_putendl_fd("minishell: failed to initialize environment", 2);
+        return (1);
+    }
+    
+    status = shell_loop(&shell);  // Start main shell loop
+    shell_cleanup(&shell);        // Cleanup resources before exit
+    return (status);              // Return final exit status
+}
+
+// Shell Initialization Function
+void shell_init(t_shell *shell, char **env)
+{
+    shell->env = env_init(env);              // Initialize environment variables
+    shell->last_exit_status = 0;             // Set initial exit status
+    shell->in_heredoc = 0;                   // Not in heredoc mode initially
+    shell->current_cmd = NULL;               // No command being processed initially
+    terminal_init(shell);                    // Initialize terminal settings
+    terminal_disable_echoctl(shell);         // Disable control character echoing
+    setup_signals();                         // Set up signal handlers
+}
+
+// Terminal Initialization
+void terminal_init(t_shell *shell)
+{
+    // Save original terminal settings for restoration later
+    tcgetattr(STDIN_FILENO, &shell->original_term);
+}
+
+// Disable Control Character Echoing
+void terminal_disable_echoctl(t_shell *shell)
+{
+    struct termios term;
+
+    (void)shell;  // Unused parameter
+    tcgetattr(STDIN_FILENO, &term);     // Get current terminal settings
+    term.c_lflag &= ~ECHOCTL;           // Disable control character echoing
+    tcsetattr(STDIN_FILENO, TCSANOW, &term);  // Apply new settings
+}
+
+// Signal Handler Setup
+void setup_signals(void)
+{
+    struct sigaction sa_int;    // For SIGINT (Ctrl+C)
+    struct sigaction sa_quit;   // For SIGQUIT (Ctrl+\)
+
+    // Setup SIGINT handler
+    sa_int.sa_handler = handle_sigint;
+    sa_int.sa_flags = 0;
+    sigemptyset(&sa_int.sa_mask);
+    sigaction(SIGINT, &sa_int, NULL);
+
+    // Ignore SIGQUIT
+    sa_quit.sa_handler = SIG_IGN;
+    sa_quit.sa_flags = 0;
+    sigemptyset(&sa_quit.sa_mask);
+    sigaction(SIGQUIT, &sa_quit, NULL);
+}
+
+// Main Shell Loop
+int shell_loop(t_shell *shell)
+{
+    char *input;
+
+    while (1)
+    {
+        shell_reset_signals();           // Reset signal handlers
+        input = readline(PROMPT);        // Read user input
+        
+        if (!input)                      // Handle EOF (Ctrl+D)
+        {
+            shell_cleanup_and_break(shell, NULL);
+            break;
+        }
+        
+        if (*input)                      // If input is not empty
+            add_history(input);          // Add to command history
+            
+        if (!shell_process_input(shell, input))  // Process the input
+        {
+            shell_cleanup_and_break(shell, input);
+            break;
+        }
+        
+        free(input);                     // Free input buffer
+    }
+    return (shell->last_exit_status);    // Return final exit status
+}
+
+// Reset Signal Handlers
+// This function is called at the start of each shell loop iteration
+// to ensure consistent signal handling
+void    shell_reset_signals(void)
+{
+    signal(SIGINT, handle_sigint);    // Set up Ctrl+C handler
+    signal(SIGQUIT, SIG_IGN);         // Ignore Ctrl+\ (quit signal)
+    signal(SIGTERM, SIG_IGN);         // Ignore termination signal
+}
+
+// Cleanup and Break Shell Loop
+// This function handles cleanup when we need to exit the shell loop
+// Either due to EOF (Ctrl+D) or error conditions
+static void    shell_cleanup_and_break(t_shell *shell, char *input)
+{
+    free(input);                      // Free the input buffer if it exists
+    if (shell->current_cmd)           // If there's an active command
+    {
+        parser_destroy_command(shell->current_cmd);  // Clean up command structure
+        shell->current_cmd = NULL;    // Reset the command pointer
+    }
+}
+
+// Destroy Command Structure
+// Recursively cleans up all resources associated with a command
+void    parser_destroy_command(t_command *cmd)
+{
+    if (!cmd)                         // If no command, nothing to do
+        return;
+        
+    if (cmd->args)                    // Free command arguments
+        parser_free_args(cmd->args);
+    if (cmd->redirects)               // Clean up any redirections
+        parser_cleanup_redirects(cmd->redirects);
+    if (cmd->pipe_next)               // Clean up piped commands recursively
+        parser_cleanup_pipe(cmd->pipe_next);
+        
+    // Close any open pipe file descriptors
+    if (cmd->pipe_fd[0] != -1)
+        close(cmd->pipe_fd[0]);
+    if (cmd->pipe_fd[1] != -1)
+        close(cmd->pipe_fd[1]);
+        
+    free(cmd);                        // Free the command structure itself
+}
+
+// Input Processing
+int shell_process_input(t_shell *shell, char *input)
+{
+    t_token *tokens;
+    char    *expanded;
+
+    if (!input || !*input)           // Skip empty input
+        return (1);
+        
+    // Expand environment variables
+    expanded = env_expand_vars(input, shell);
+    if (!expanded)
+        return (1);
+        
+    // Tokenize the expanded input
+    tokens = lexer_tokenize(expanded);
+    free(expanded);
+    if (!tokens)
+        return (1);
+        
+    // Parse tokens into command structure
+    shell->current_cmd = parser_parse_tokens(tokens);
+    lexer_destroy(tokens);
+    if (!shell->current_cmd)
+        return (1);
+        
+    // Execute the command and store exit status
+    shell->last_exit_status = executor_run_command(shell->current_cmd, shell);
+    shell_free_command(shell);
+    return (1);
+}
+
+// Variable Expansion Functions
+char *env_expand_vars(char *str, t_shell *shell)
+{
+    char    *exp;
+    int     i;
+    int     in_single_quote;
+
+    // Initialize expansion with copy of input
+    exp = init_expansion(str);
+    if (!exp)
+        return (NULL);
+        
+    i = 0;
+    in_single_quote = 0;
+    
+    // Process each character
+    while (exp[i])
+    {
+        exp = process_char(exp, &i, &in_single_quote, shell);
+        if (!exp)
+            return (NULL);
+    }
+    return (exp);
+}
+
+// Initialize String for Variable Expansion
+// Creates a copy of input string for safe manipulation
+char    *init_expansion(char *str)
+{
+    char    *exp;
+
+    if (!str)
+        return (NULL);
+    exp = ft_strdup(str);             // Create a duplicate of input string
+    if (!exp)
+        return (NULL);
+    return (exp);
+}
+
+// Process Individual Characters During Expansion
+static char *process_char(char *exp, int *i, int *in_single_quote, t_shell *shell)
+{
+    char *new_str;
+
+    // Handle single quotes
+    *in_single_quote = handle_single_quotes(exp[*i], *in_single_quote);
+    
+    if (!*in_single_quote)
+    {
+        // Process variable expansion outside single quotes
+        new_str = process_expansion(exp, i, shell);
+        exp = handle_expansion_result(exp, new_str);
+        if (!exp)
+            return (NULL);
+        if (new_str != exp)
+            return (exp);
+    }
+    else
+        (*i)++;
+        
+    return (exp);
+}
+
+
+// Handle Single Quote State
+// Manages the state of being inside or outside single quotes
+// Returns 1 if we're now inside single quotes, 0 if outside
+int     handle_single_quotes(char c, int in_single_quote)
+{
+    if (c == '\'')                    // If we encounter a single quote
+        return (!in_single_quote);    // Toggle the state
+    return (in_single_quote);         // Otherwise maintain current state
+}
+
+static char *process_expansion(char *exp, int *i, t_shell *shell)
+{
+    char *str;
+
+    // Check for variable expansion symbol ($)
+    if (exp[*i] == '$' && exp[*i + 1] && exp[*i + 1] != ' '
+        && exp[*i + 1] != '\'' && exp[*i + 1] != '"')
+    {
+        // Handle special $? variable
+        if (exp[*i + 1] == '?')
+            return (handle_exit_status_expansion(exp, *i, shell));
+            
+        // Handle normal variable expansion
+        str = expand_variable(exp, *i, shell);
+        if (!str)
+            return (NULL);
+        return (str);
+    }
+    
+    (*i)++;
+    return (exp);
+}
+
+// Handle Exit Status Variable Expansion
+// Specifically handles the $? special variable which returns last exit status
+static char    *handle_exit_status_expansion(char *exp, int i, t_shell *shell)
+{
+    char    *status_str;
+    char    *str;
+
+    // Convert exit status number to string
+    status_str = ft_itoa(shell->last_exit_status);
+    if (!status_str)
+        return (NULL);
+        
+    // Replace $? with the actual exit status
+    str = env_replace_var(exp, i, 2, status_str);
+    free(status_str);                 // Free the temporary status string
+    return (str);
+}
+
+// Replace Variable in String
+// Replaces a portion of a string with a new value
+char    *env_replace_var(char *str, int start, int len, char *value)
+{
+    char    *new_str;
+    int     new_len;
+    int     value_len;
+
+    // Calculate the length of the replacement value
+    if (value)
+        value_len = ft_strlen(value);
+    else
+        value_len = 0;
+        
+    // Calculate the required length for the new string
+    new_len = ft_strlen(str) - len + value_len;
+    
+    // Allocate memory for new string
+    new_str = (char *)malloc(sizeof(char) * (new_len + 1));
+    if (!new_str)
+        return (NULL);
+        
+    // Copy the string in three parts:
+    // 1. Everything before the variable
+    ft_strlcpy(new_str, str, start + 1);
+    // 2. The variable's value (if it exists)
+    if (value)
+        ft_strlcpy(new_str + start, value, value_len + 1);
+    // 3. Everything after the variable
+    ft_strlcpy(new_str + start + value_len, 
+               str + start + len, 
+               ft_strlen(str + start + len) + 1);
+               
+    return (new_str);
+}
+
+
+// Function: expand_variable
+// Purpose: Expands a shell variable (e.g., $PATH, $HOME) to its actual value
+// Parameters:
+//   - expanded: The string containing the variable to expand
+//   - i: Current position in the string (points to the $ character)
+//   - shell: Shell structure containing environment variables and state
+
+char    *expand_variable(char *expanded, int i, t_shell *shell)
+{
+    char    *var_name;    // Will hold the variable name (e.g., "PATH" from "$PATH")
+    char    *var_value;   // Will hold the variable's value
+    char    *new_str;     // Will hold the final expanded string
+
+    // Step 1: Extract variable name
+    // Gets everything after the $ up to a delimiter
+    // e.g., in "$PATH/bin", gets "PATH"
+    var_name = env_get_var_name(expanded + i + 1);
+    if (!var_name)
+        return (NULL);    // Return NULL if we can't get the variable name
+    
+    // Step 2: Get variable's value
+    // Looks up the value in environment variables
+    // For $PATH might return "/usr/local/bin:/usr/bin:/bin"
+    var_value = get_var_value(var_name, shell);
+    
+    // Step 3: Replace the variable with its value
+    // Takes the original string and replaces $NAME with its value
+    // Length parameter includes the $ symbol (hence +1)
+    new_str = env_replace_var(expanded, i, ft_strlen(var_name) + 1, var_value);
+    
+    // Step 4: Special cleanup for $? variable
+    // The $? variable (last exit status) needs special memory handling
+    // because get_var_value creates a new string for it
+    if (var_value && ft_strncmp(var_name, "?", 2) == 0)
+        free(var_value);
+    
+    // Step 5: Cleanup and return
+    free(var_name);      // Free the extracted variable name
+    return (new_str);    // Return the new expanded string
+
+    // Example transformation:
+    // Input:  "echo $PATH/bin"
+    // After var_name:  var_name = "PATH"
+    // After var_value: var_value = "/usr/local/bin:/usr/bin:/bin"
+    // Final output:    "echo /usr/local/bin:/usr/bin:/bin/bin"
+}
+
+// Memory management:
+// - Creates new string for var_name (freed at end)
+// - Gets var_value (freed only for $? case)
+// - Creates new string for final result
+// - Caller is responsible for freeing the returned string
+
+// Get Variable Name
+// Extracts a variable name from the string (part after $)
+char    *env_get_var_name(char *str)
+{
+    int     len;
+    char    *name;
+
+    len = env_var_length(str);        // Get length of variable name
+    name = ft_substr(str, 0, len);    // Extract the name
+    return (name);
+}
+
+// Get Variable Value
+// Retrieves the value of a variable from environment or special vars
+char    *get_var_value(char *var_name, t_shell *shell)
+{
+    // Handle special $? variable for last exit status
+    if (ft_strncmp(var_name, "?", 2) == 0)
+        return (ft_itoa(shell->last_exit_status));
+        
+    // Get value from environment variables
+    return (env_get_value(var_name, shell->env));
+}
+
+
+
+
+t_token	*lexer_tokenize(char *input)
+{
+	t_token	*tokens;
+	t_token	*new;
+	int		i;
+
+	if (!input)
+		return (NULL);
+	tokens = NULL;
+	i = 0;
+	while (input[i])
+	{
+		if (!lexer_skip_spaces(input, &i))
+			continue ;
+		if (input[i] == '\'' || input[i] == '"')
+			new = lexer_handle_quotes(input, &i, input[i]);
+		else if (lexer_is_operator(input[i]))
+			new = lexer_handle_operator(input, &i);
+		else
+			new = lexer_handle_word(input, &i);
+		if (!lexer_process_token(&tokens, new))
+			return (lexer_clear_tokens(&tokens), NULL);
+	}
+	return (tokens);
+}
+
+int	lexer_skip_spaces(char *input, int *i)
+{
+	while (input[*i] && (input[*i] == ' ' || input[*i] == '\t'))
+		(*i)++;
+	return (input[*i] != '\0');
+}
+
+t_token	*lexer_handle_quotes(char *input, int *i, char quote)
+{
+	char	word[4096];
+	int		j;
+
+	j = 0;
+	(*i)++;
+	while (input[*i] && input[*i] != quote)
+	{
+		word[j++] = input[*i];
+		(*i)++;
+	}
+	if (input[*i] == quote)
+		(*i)++;
+	word[j] = '\0';
+	return (lexer_create_token(word, TOKEN_WORD));
+}
+
+int	lexer_is_operator(char c)
+{
+	return (c == '|' || c == '<' || c == '>');
+}
+
+t_token	*lexer_handle_operator(char *input, int *i)
+{
+	char	op[3];
+	int		type;
+
+	op[0] = input[*i];
+	op[1] = '\0';
+	op[2] = '\0';
+	if (input[*i + 1] == input[*i])
+	{
+		op[1] = input[*i];
+		(*i)++;
+	}
+	type = TOKEN_PIPE;
+	if (op[0] == '<' && !op[1])
+		type = TOKEN_REDIR_IN;
+	else if (op[0] == '>' && !op[1])
+		type = TOKEN_REDIR_OUT;
+	else if (op[0] == '>' && op[1])
+		type = TOKEN_REDIR_APPEND;
+	else if (op[0] == '<' && op[1])
+		type = TOKEN_HEREDOC;
+	(*i)++;
+	return (lexer_create_token(op, type));
+}
+
+t_token	*lexer_handle_word(char *input, int *i)
+{
+	char	*parts[1024];
+	int		part_count;
+
+	part_count = 0;
+	while (input[*i] && !lexer_is_operator(input[*i]) && input[*i] != ' '
+		&& input[*i] != '\t')
+	{
+		if (!handle_part(parts, input, i, &part_count))
+			return (NULL);
+	}
+	return (cleanup_and_create_token(parts, part_count));
+}
+
+int	lexer_process_token(t_token **tokens, t_token *new)
+{
+	if (!new)
+		return (0);
+	lexer_add_token(tokens, new);
+	return (1);
+}
+
+void	lexer_clear_tokens(t_token **list)
+{
+	if (!list || !*list)
+		return ;
+	lexer_destroy(*list);
+	*list = NULL;
+}
