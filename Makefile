@@ -6,7 +6,6 @@ RESET = \033[0m
 NAME = minishell
 CC = cc
 CFLAGS = -Wall -Wextra -Werror
-SETUP_SCRIPT = ./setup.sh
 
 .PHONY: all clean fclean re libft-init
 
@@ -66,11 +65,14 @@ LDFLAGS += -L$(LIBFT_DIR) -lftprintf -L/usr/lib -lreadline
 all: libft-init $(NAME)
 
 libft-init:
+	@if ! command -v git &> /dev/null; then \
+		echo "$(RED)Error: git is not installed$(RESET)"; \
+		exit 1; \
+	fi
 	@if [ ! -d "$(LIBFT_DIR)" ] || [ ! -f "$(LIBFT_DIR)/Makefile" ]; then \
-		echo "$(YELLOW)Running setup script...$(RESET)"; \
-		chmod +x $(SETUP_SCRIPT); \
-		./$(SETUP_SCRIPT); \
-		echo "$(GREEN)Setup complete!$(RESET)"; \
+		echo "$(YELLOW)Initializing and updating git submodules...$(RESET)"; \
+		git submodule update --init --recursive; \
+		echo "$(GREEN)Submodules updated successfully!$(RESET)"; \
 	fi
 
 $(NAME): $(OBJS) $(LIBFT)
